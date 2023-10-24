@@ -24,8 +24,7 @@ Este é o código-fonte para o primeiro projeto de AED 2023-2024.
 
 Leia as sugestões de desenvolvimento em [`TIPS.md`][tips].
 
-Também encontra pode ler sobre os princípios da
-[programação por contrato][dbc],
+Também pode ler sobre os princípios da [programação por contrato][dbc],
 que são seguidos neste projeto.
 
 [tips]: TIPS.md
