@@ -1,3 +1,10 @@
+# Others
+*.zip
+*.pgm
+test/
+imageTest
+imageTool
+
 # Prerequisites
 *.d
 

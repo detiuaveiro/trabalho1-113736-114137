@@ -20,6 +20,17 @@ Este é o código-fonte para o primeiro projeto de AED 2023-2024.
 - `make clean` - Limpa ficheiros objeto e executáveis.
 
 
+## Atualizar repositório
+
+Dado a natureza do trabalho poderá ser necessário actualizar o repositório actual a partir do base (upstream).
+Para isso basta seguir os seguintes comandos:
+
+```bash
+git remote add upstream git@github.com:detiuaveiro/image8bit-pub.git
+git fetch upstream
+git rebase upstream/master
+```
+
 ## Recursos
 
 Leia as sugestões de desenvolvimento em [`TIPS.md`][tips].
