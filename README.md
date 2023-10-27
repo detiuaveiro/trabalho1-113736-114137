@@ -2,15 +2,15 @@
 
 Este é o código-fonte para o primeiro projeto de AED 2023-2024.
 
-
 ## Ficheiros
 
 - `image8bit.c` - implementação do módulo
 - `image8bit.h` - interface do módulo
 - `imageTest.c` - programa de teste simples
 - `imageTool.c` - programa de teste mais versátil
-- `Makefile`    - regras para compilar usando `make`
-- `HINTS.md`    - informações para os alunos
+- `Makefile`    - regras para compilar e testar usando `make`
+- `README.md`   - estas informações que está a ler
+- `TIPS.md`     - sugestões para os alunos
 - `Design-by-Contract.md` - explicação sobre metodologia DbC
 
 
@@ -20,10 +20,13 @@ Este é o código-fonte para o primeiro projeto de AED 2023-2024.
 - `make clean` - Limpa ficheiros objeto e executáveis.
 
 
+
 ## Atualizar repositório
 
-Dado a natureza do trabalho poderá ser necessário actualizar o repositório actual a partir do base (upstream).
-Para isso basta seguir os seguintes comandos:
+
+Dada a natureza do trabalho, poderá ser necessário
+atualizar repositório base (upstream) deste projeto.
+Se isso acontecer, deverá atualizar o seu repositório com os seguintes comandos:
 
 ```bash
 git remote add upstream git@github.com:detiuaveiro/image8bit-pub.git
