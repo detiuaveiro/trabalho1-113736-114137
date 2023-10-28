@@ -72,7 +72,7 @@ Se isso acontecer, deverá atualizar o seu repositório com os seguintes comando
 ```bash
 git remote add upstream git@github.com:detiuaveiro/image8bit-pub.git
 git fetch upstream
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 
