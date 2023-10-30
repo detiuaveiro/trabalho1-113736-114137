@@ -1,0 +1,94 @@
+{
+  "tests": [
+    {
+      "name": "Neg",
+      "setup": "make setup",
+      "run": "make test1",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Thr",
+      "setup": "make setup",
+      "run": "make test2",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Bri",
+      "setup": "make setup",
+      "run": "make test3",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Rotate",
+      "setup": "make setup",
+      "run": "make test4",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Mirror",
+      "setup": "make setup",
+      "run": "make test5",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Crop",
+      "setup": "make setup",
+      "run": "make test6",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Paste",
+      "setup": "make setup",
+      "run": "make test7",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Blend",
+      "setup": "make setup",
+      "run": "make test8",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Blur",
+      "setup": "make setup",
+      "run": "make test9",
+      "input": "",
+      "output": "",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 20
+    }
+  ]
+}
