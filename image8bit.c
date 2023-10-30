@@ -167,11 +167,26 @@ void ImageInit(void) { ///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
+
 Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (width >= 0);
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
-  // Insert your code here!
+  
+  Image img = NULL; // Define uma variável do tipo Image
+  int success = // Verifica se a criação da imagem foi bem sucedida (1) ou não (0)
+  // Alocação de memória para a imagem e para o array de pixeis
+  check( (img = (Image)malloc(sizeof(struct image))) != NULL, "Allocation failed" ) &&
+  check( (img->pixel = (uint8*)malloc(width*height*sizeof(uint8))) != NULL, "Allocation failed" );
+  PIXMEM += (unsigned long)(width*height);  // Acrescenta o número de pixeis à variável PIXMEM
+
+  // Cleanup caso a criação da imagem não tenha sido bem sucedida
+  if (!success) {
+    errsave = errno;
+    ImageDestroy(&img);
+    errno = errsave;
+  }
+  return img;
 }
 
 /// Destroy the image pointed to by (*imgp).
@@ -181,7 +196,11 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 /// Should never fail, and should preserve global errno/errCause.
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
-  // Insert your code here!
+  if (*imgp != NULL) { // Verifica se a imagem existe
+    free((*imgp)->pixel); // Liberta a memória alocada para o array de pixeis
+    free(*imgp); // Liberta a memória alocada para a imagem
+    *imgp = NULL; // Define o endereço da imagem como NULL
+  }
 }
 
 
