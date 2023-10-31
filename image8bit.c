@@ -399,11 +399,10 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 void ImageNegative(Image img) { ///
   assert (img != NULL);
   //Written by us
-  int witdh = img->width;
-  int height = img->height;
+  int size = img->width * img->height;
   uint8 maxval = img->maxval;
   // Percorrer o array de pixeis e aplicar a transformação
-  for (int i=0; i < witdh*height; i++){
+  for (int i=0; i < size; i++){
     PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
     img->pixel[i] = maxval - img->pixel[i]; // Aplicar a transformação
   }
@@ -414,8 +413,13 @@ void ImageNegative(Image img) { ///
 /// all pixels with level>=thr to white (maxval).
 void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
-  // Insert your code here!
-
+  //Written by us
+  int size = img->width * img->height;
+  for (int i=0; i < size; i++){
+    PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
+    if (img->pixel[i] < thr) img->pixel[i] = 0; // Se < thr -> preto
+    else img->pixel[i] = img->maxval; // Se >= thr -> branco
+  }
 }
 
 /// Brighten image by a factor.
@@ -425,7 +429,6 @@ void ImageThreshold(Image img, uint8 thr) { ///
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   // ? assert (factor >= 0.0);
-  // Insert your code here!
 }
 
 
