@@ -172,13 +172,15 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (width >= 0);
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
-  
+  //Written by us
+
   Image img = NULL; // Define uma variável do tipo Image
   int success = // Verifica se a criação da imagem foi bem sucedida (1) ou não (0)
   // Alocação de memória para a imagem e para o array de pixeis
   check( (img = (Image)malloc(sizeof(struct image))) != NULL, "Allocation failed" ) &&
   check( (img->pixel = (uint8*)malloc(width*height*sizeof(uint8))) != NULL, "Allocation failed" );
   PIXMEM += (unsigned long)(width*height);  // Acrescenta o número de pixeis à variável PIXMEM
+  // não tenho a ctz q é necessário colocar aqui pois na ImageSave já tem
   
   // Alocar o conteúdo
   img->width = width;
@@ -201,6 +203,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 /// Should never fail, and should preserve global errno/errCause.
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
+  //Written by us
   if (*imgp != NULL) { // Verifica se a imagem existe
     free((*imgp)->pixel); // Liberta a memória alocada para o array de pixeis
     free(*imgp); // Liberta a memória alocada para a imagem
@@ -317,7 +320,7 @@ int ImageMaxval(Image img) { ///
 /// *max is set to the maximum.
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
-
+  //Written by us
   // Tamanho do array
   int size = img->width * img->height;
 
@@ -358,6 +361,7 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
   int index;
+  //Written by us
   // Transformar para um index linear
   index = y * img->width + x; // Transformar (33,0) -> [33] e (22,1) -> [122]
   assert (0 <= index && index < img->width*img->height);
@@ -394,7 +398,15 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 /// resulting in a "photographic negative" effect.
 void ImageNegative(Image img) { ///
   assert (img != NULL);
-  // Insert your code here!
+  //Written by us
+  int witdh = img->width;
+  int height = img->height;
+  uint8 maxval = img->maxval;
+  // Percorrer o array de pixeis e aplicar a transformação
+  for (int i=0; i < witdh*height; i++){
+    PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
+    img->pixel[i] = maxval - img->pixel[i]; // Aplicar a transformação
+  }
 }
 
 /// Apply threshold to image.
@@ -403,6 +415,7 @@ void ImageNegative(Image img) { ///
 void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
+
 }
 
 /// Brighten image by a factor.
