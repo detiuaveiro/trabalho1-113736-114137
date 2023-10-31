@@ -179,6 +179,11 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   check( (img = (Image)malloc(sizeof(struct image))) != NULL, "Allocation failed" ) &&
   check( (img->pixel = (uint8*)malloc(width*height*sizeof(uint8))) != NULL, "Allocation failed" );
   PIXMEM += (unsigned long)(width*height);  // Acrescenta o número de pixeis à variável PIXMEM
+  
+  // Alocar o conteúdo
+  img->width = width;
+  img->height = height;
+  img->maxval = maxval;
 
   // Cleanup caso a criação da imagem não tenha sido bem sucedida
   if (!success) {
@@ -312,7 +317,21 @@ int ImageMaxval(Image img) { ///
 /// *max is set to the maximum.
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
-  // Insert your code here!
+
+  // Tamanho do array
+  int size = img->width * img->height;
+
+  // Inicializar min e max
+  *min = img->pixel[0];
+  *max = img->pixel[0]; 
+
+  // Percorrer o array para dar Update caso necessário
+  for (int i=0; i < size; i++){
+    uint8 pixel_val = img->pixel[i];
+    if (pixel_val < *min) *min = pixel_val; // Update no min
+    if (pixel_val > *max) *max = pixel_val; // Update no max
+  }
+  
 }
 
 /// Check if pixel position (x,y) is inside img.
@@ -339,7 +358,8 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
   int index;
-  // Insert your code here!
+  // Transformar para um index linear
+  index = y * img->width + x; // Transformar (33,0) -> [33] e (22,1) -> [122]
   assert (0 <= index && index < img->width*img->height);
   return index;
 }
