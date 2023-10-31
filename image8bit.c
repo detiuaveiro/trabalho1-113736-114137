@@ -439,7 +439,7 @@ void ImageBrighten(Image img, double factor) { ///
   // Percorrer o array de pixeis e aplicar a transformação
   for (int i=0; i < size; i++){
     PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
-    double new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
+    uint8 new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
     if (new_pixel > maxval) img->pixel[i] = maxval; // Saturar
     else img->pixel[i] = new_pixel; // Não saturar
   }
