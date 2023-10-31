@@ -432,7 +432,17 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  // ? assert (factor >= 0.0);
+  assert (factor >= 0.0);
+  //Written by us
+  int size = img->width * img->height;
+  uint8 maxval = img->maxval;
+  // Percorrer o array de pixeis e aplicar a transformação
+  for (int i=0; i < size; i++){
+    PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
+    double new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
+    if (new_pixel > maxval) img->pixel[i] = maxval; // Saturar
+    else img->pixel[i] = new_pixel; // Não saturar
+  }
 }
 
 
