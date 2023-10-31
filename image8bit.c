@@ -187,6 +187,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   img->height = height;
   img->maxval = maxval;
 
+  for (int i = 0; i < width * height; i++) {
+    img->pixel[i] = 0;
+  }
+
   // Cleanup caso a criação da imagem não tenha sido bem sucedida
   if (!success) {
     errsave = errno;
