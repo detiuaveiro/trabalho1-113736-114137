@@ -350,14 +350,12 @@ int ImageValidPos(Image img, int x, int y) { ///
 /// Check if rectangular area (x,y,w,h) is completely inside img.
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
+  // written by us
   assert(w >= 0 && h >= 0);
   assert(x >= 0 && y >= 0);
-  // Insert your code here!
-  // written by us
   // (x,y) -> canto superior esquerdo
   // (x+w,y+h) -> canto inferior direito do retangulo
-  if (x + w > img->width || y + h > img->height) return 0; // Não está dentro da imagem
-  return 1; // Está dentro da imagem
+  return (x + w > img->width || y + h > img->height); //  1 -> está dentro da imagem, 0 -> não está
 }
 
 /// Pixel get & set operations
@@ -476,7 +474,17 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
-  // Insert your code here!
+
+  // Criação da nova imagem
+  Image img_rotated = ImageCreate(img->height, img->width, img->maxval); 
+
+  for (int x=0; x < img->width; x++){
+    for (int y=0; y < img->height; y++){
+      uint8 pixel = ImageGetPixel(img, x, y);
+      ImageSetPixel(img_rotated, img->width - x - 1, y, pixel);
+    }
+  }
+  return img_rotated;
 }
 
 /// Mirror an image = flip left-right.
