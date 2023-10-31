@@ -351,6 +351,10 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
+  // written by us
+  // (x,y) -> canto superior esquerdo
+  // (x+w,y+h) -> canto inferior direito
+  return (0 <= x && x < img->width) && (0 <= y && y < img->height) && (0 <= x+w && x+w < img->width) && (0 <= y+h && y+h < img->height);
 }
 
 /// Pixel get & set operations
