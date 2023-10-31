@@ -350,11 +350,14 @@ int ImageValidPos(Image img, int x, int y) { ///
 /// Check if rectangular area (x,y,w,h) is completely inside img.
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
+  assert(w >= 0 && h >= 0);
+  assert(x >= 0 && y >= 0);
   // Insert your code here!
   // written by us
   // (x,y) -> canto superior esquerdo
-  // (x+w,y+h) -> canto inferior direito
-  return (0 <= x && x < img->width) && (0 <= y && y < img->height) && (0 <= x+w && x+w < img->width) && (0 <= y+h && y+h < img->height);
+  // (x+w,y+h) -> canto inferior direito do retangulo
+  if (x + w > img->width || y + h > img->height) return 0; // Não está dentro da imagem
+  return 1; // Está dentro da imagem
 }
 
 /// Pixel get & set operations
