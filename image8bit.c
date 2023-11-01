@@ -474,14 +474,16 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
-
+  //written by us
   // Criação da nova imagem
   Image img_rotated = ImageCreate(img->height, img->width, img->maxval); 
+
+  // Percorrer o array de pixeis e aplicar a transformação
 
   for (int x=0; x < img->width; x++){
     for (int y=0; y < img->height; y++){
       uint8 pixel = ImageGetPixel(img, x, y);
-      ImageSetPixel(img_rotated, img->width - x - 1, y, pixel);
+      ImageSetPixel(img_rotated, y, img->width - x - 1, pixel);
     }
   }
   return img_rotated;
@@ -496,7 +498,17 @@ Image ImageRotate(Image img) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageMirror(Image img) { ///
   assert (img != NULL);
-  // Insert your code here!
+  // written by us
+  // Criação da nova imagem
+  Image img_mirrored = ImageCreate(img->width, img->height, img->maxval);
+  for (int x=0; x < img->width; x++){
+    for (int y=0; y < img->height; y++){
+      uint8 pixel = ImageGetPixel(img, x, y);
+      ImageSetPixel(img_mirrored, img->width - x - 1, y, pixel);
+    }
+    
+  }
+
 }
 
 /// Crop a rectangular subimage from img.
