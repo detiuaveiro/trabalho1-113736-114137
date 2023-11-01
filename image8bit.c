@@ -481,7 +481,7 @@ Image ImageRotate(Image img) { ///
   for (int x=0; x < img->width; x++){ 
     for (int y=0; y < img->height; y++){
       uint8 pixel = ImageGetPixel(img, x, y);
-      ImageSetPixel(img_rotated, y, img->width - x - 1, pixel);
+      ImageSetPixel(img_rotated, y, img->width - x - 1, pixel); // 90 graus clockwise
     }
   }
   
@@ -503,7 +503,7 @@ Image ImageMirror(Image img) { ///
   for (int x=0; x < img->width; x++){
     for (int y=0; y < img->height; y++){
       uint8 pixel = ImageGetPixel(img, x, y);
-      ImageSetPixel(img_mirrored, img->width - x - 1, y, pixel);
+      ImageSetPixel(img_mirrored, img->width - x - 1, y, pixel); // Mirror/Flip left-right
     }
     
   }
@@ -524,7 +524,18 @@ Image ImageMirror(Image img) { ///
 Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   assert (ImageValidRect(img, x, y, w, h));
-  // Insert your code here!
+  // Written by us
+  // x,y,w,h já estão asserted no ImageValidRect
+  Image img_cropped = ImageCreate(w, h, img->maxval);
+  
+  //x e y são as coordenadas do canto superior esquerdo da imagem cropped ()
+  for (int i=x; i < x + w ; i++){  
+    for (int j=y; j < y + h; j++){
+      uint8 pixel = ImageGetPixel(img, i, j);
+      ImageSetPixel(img_cropped, i-x, j-y, pixel);
+    }
+  }
+  return img_cropped;
 }
 
 
@@ -538,7 +549,8 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  // Insert your code here!
+  // Written by us
+  
 }
 
 /// Blend an image into a larger image.
