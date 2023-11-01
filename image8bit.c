@@ -507,7 +507,6 @@ Image ImageMirror(Image img) { ///
     }
     
   }
-
 }
 
 /// Crop a rectangular subimage from img.
