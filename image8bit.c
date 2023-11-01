@@ -474,16 +474,17 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
-
+  // Written by us
   // Criação da nova imagem
   Image img_rotated = ImageCreate(img->height, img->width, img->maxval); 
-
-  for (int x=0; x < img->width; x++){
+  // Percorrer linhas & colunas
+  for (int x=0; x < img->width; x++){ 
     for (int y=0; y < img->height; y++){
       uint8 pixel = ImageGetPixel(img, x, y);
-      ImageSetPixel(img_rotated, img->width - x - 1, y, pixel);
+      ImageSetPixel(img_rotated, y, img->height - x - 1, pixel); // Rodar 90 graus o pixel clockwise
     }
   }
+  
   return img_rotated;
 }
 
