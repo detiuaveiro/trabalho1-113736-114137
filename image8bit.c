@@ -618,7 +618,17 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
-  // Insert your code here!
+  // Written by us
+  int match = 0;
+  for (int x=0; x < img1->width - img2->width; x++){  
+    for (int y=0; y < img1->height - img2->height; y++){
+      if (ImageMatchSubImage(img1, x, y, img2)){
+        *px = x;
+        *py = y;
+        match = 1;
+      }
+    }
+  }
 }
 
 
@@ -629,6 +639,30 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
-  // Insert your code here!
+  // Written by us
+  assert (img != NULL);
+  assert (dx >= 0 && dy >= 0);
+  int size = img->width * img->height;
+  uint8 maxval = img->maxval;
+  // Criação da nova imagem
+  Image img_blurred = ImageCreate(img->width, img->height, img->maxval);
+
+  // Percorrer linhas & colunas
+  for (int x=0; x < img->width; x++){ 
+    for (int y=0; y < img->height; y++){
+      int sum = 0;
+      int count = 0;
+      for (int x_cord=x-dx; x_cord <= x+dx; x_cord++){  // Percorrer o retângulo
+        for (int y_cord=y-dy; y_cord <= y+dy; y_cord++){
+          if (ImageValidPos(img, x_cord, y_cord)){
+            sum += ImageGetPixel(img, x_cord, y_cord);
+            count++;
+          }
+        }
+      }
+      uint8 new_pixel = sum / count; // Média dos pixeis
+      ImageSetPixel(img_blurred, x, y, new_pixel);
+    }
+  }
 }
 
