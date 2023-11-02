@@ -590,24 +590,14 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   // written by us
   // x,y já estão asserted no ImageValidPos
 
-  //tentativa do copilot
-  int match = 1;
   for (int x_cord=x; x_cord < x + img2->width; x_cord++){  
     for (int y_cord=y; y_cord < y + img2->height; y_cord++){
       uint8 pixel1 = ImageGetPixel(img1, x_cord, y_cord);
       uint8 pixel2 = ImageGetPixel(img2, x_cord-x, y_cord-y);
-      if (pixel1 != pixel2) match = 0;
+      if (pixel1 != pixel2) return 0; // Para nao ser necessário percorrer o loop todo
     }
   }
-
-  //minha tentativa
-  /*
-  int match = 1;
-  Image img_cropped = ImageCrop(img1, x, y, img2->width, img2->height);
-  if (img_cropped != img2) match = 0;
-  ImageDestroy(&img_cropped);
-  */
-  return match;
+  return 1; // caso sejam todos iguais
 
 }
 
@@ -643,7 +633,9 @@ void ImageBlur(Image img, int dx, int dy) { ///
   // Written by us
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
-  
+    // Criação da nova imagem
+  Image img_blurred = ImageCreate(img->width, img->height, img->maxval);
+
   // Percorrer linhas & colunas
   for (int x=0; x < img->width; x++){ 
     for (int y=0; y < img->height; y++){
@@ -658,7 +650,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
         }
       }
       uint8 new_pixel = sum / count; // Média dos pixeis
-      ImageSetPixel(img, x, y, new_pixel);
+      ImageSetPixel(img_blurred, x, y, new_pixel);
     }
   }
 }
