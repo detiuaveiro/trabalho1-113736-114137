@@ -11,7 +11,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <error.h>
+#include "error.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +19,7 @@
 #include "instrumentation.h"
 
 int main(int argc, char* argv[]) {
+  program_name = argv[0];
   if (argc != 3) {
     error(1, 0, "Usage: imageTest input.pgm output.pgm");
   }
