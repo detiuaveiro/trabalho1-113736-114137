@@ -643,9 +643,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
   // Written by us
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
-    // Criação da nova imagem
-  Image img_blurred = ImageCreate(img->width, img->height, img->maxval);
-
+  
   // Percorrer linhas & colunas
   for (int x=0; x < img->width; x++){ 
     for (int y=0; y < img->height; y++){
@@ -660,7 +658,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
         }
       }
       uint8 new_pixel = sum / count; // Média dos pixeis
-      ImageSetPixel(img_blurred, x, y, new_pixel);
+      ImageSetPixel(img, x, y, new_pixel);
     }
   }
 }
