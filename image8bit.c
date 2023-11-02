@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "instrumentation.h"
+#include <math.h>
 
 
 // The data structure
@@ -445,9 +446,9 @@ void ImageBrighten(Image img, double factor) { ///
   // Percorrer o array de pixeis e aplicar a transformação
   for (int i=0; i < size; i++){
     PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
-    uint8 new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
-    if (new_pixel > maxval) img->pixel[i] = maxval; // Saturar
-    else img->pixel[i] = new_pixel; // Não saturar
+    double new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
+    if (new_pixel > (double)maxval) img->pixel[i] = maxval; // Saturar
+    else img->pixel[i] = round(new_pixel); // Não saturar
   }
 }
 
