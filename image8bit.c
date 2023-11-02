@@ -529,10 +529,10 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   // x,y,w,h já estão asserted no ImageValidRect
   Image img_cropped = ImageCreate(w, h, img->maxval);
 
-  for (int i=x; i < x + w ; i++){  
-    for (int j=y; j < y + h; j++){
-      uint8 pixel = ImageGetPixel(img, i, j);
-      ImageSetPixel(img_cropped, i-x, j-y, pixel);
+  for (int x_cord=x; x_cord < x + w ; x_cord++){    
+    for (int y_cord=y; y_cord < y + h; y_cord++){
+      uint8 pixel = ImageGetPixel(img, x_cord, y_cord);
+      ImageSetPixel(img_cropped, x_cord-x, y_cord-y, pixel);
     }
   }
   return img_cropped;
@@ -550,7 +550,12 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Written by us
-  
+  for (int x_cord=x; x_cord < 3 ; x_cord++){  
+    for (int y_cord=y; y_cord < y + img2->height; y_cord++){
+      uint8 pixel = ImageGetPixel(img2, x_cord-x, y_cord-y);
+      ImageSetPixel(img1, x_cord, y_cord, pixel);
+    }
+  }
 }
 
 /// Blend an image into a larger image.
