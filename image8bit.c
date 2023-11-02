@@ -527,20 +527,11 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   // Written by us
   // x,y,w,h já estão asserted no ImageValidRect
   Image img_cropped = ImageCreate(w, h, img->maxval);
-<<<<<<< HEAD
 
   for (int x_cord=x; x_cord < x + w ; x_cord++){    
     for (int y_cord=y; y_cord < y + h; y_cord++){
       uint8 pixel = ImageGetPixel(img, x_cord, y_cord);
       ImageSetPixel(img_cropped, x_cord-x, y_cord-y, pixel);
-=======
-  
-  //x e y são as coordenadas do canto superior esquerdo da imagem cropped ()
-  for (int i=x; i < x + w ; i++){  
-    for (int j=y; j < y + h; j++){
-      uint8 pixel = ImageGetPixel(img, i, j);
-      ImageSetPixel(img_cropped, i-x, j-y, pixel);
->>>>>>> 96d66e429248115bf20a0001091b6dc3122d3429
     }
   }
   return img_cropped;
@@ -558,7 +549,7 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Written by us
-  for (int x_cord=x; x_cord < 3 ; x_cord++){  
+  for (int x_cord=x; x_cord < x + img2->width; x_cord++){  
     for (int y_cord=y; y_cord < y + img2->height; y_cord++){
       uint8 pixel = ImageGetPixel(img2, x_cord-x, y_cord-y);
       ImageSetPixel(img1, x_cord, y_cord, pixel);
