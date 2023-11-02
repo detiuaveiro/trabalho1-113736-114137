@@ -569,7 +569,15 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  // Insert your code here!
+  // Written by us
+  for (int x_cord=x; x_cord < x + img2->width; x_cord++){  
+    for (int y_cord=y; y_cord < y + img2->height; y_cord++){
+      uint8 pixel1 = ImageGetPixel(img1, x_cord, y_cord);
+      uint8 pixel2 = ImageGetPixel(img2, x_cord-x, y_cord-y);
+      uint8 new_pixel = pixel1 * (1 - alpha) + pixel2 * alpha;
+      ImageSetPixel(img1, x_cord, y_cord, new_pixel);
+    }
+  }
 }
 
 /// Compare an image to a subimage of a larger image.
@@ -579,7 +587,28 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
-  // Insert your code here!
+  // written by us
+  // x,y já estão asserted no ImageValidPos
+
+  //tentativa do copilot
+  int match = 1;
+  for (int x_cord=x; x_cord < x + img2->width; x_cord++){  
+    for (int y_cord=y; y_cord < y + img2->height; y_cord++){
+      uint8 pixel1 = ImageGetPixel(img1, x_cord, y_cord);
+      uint8 pixel2 = ImageGetPixel(img2, x_cord-x, y_cord-y);
+      if (pixel1 != pixel2) match = 0;
+    }
+  }
+
+  //minha tentativa
+  /*
+  int match = 1;
+  Image img_cropped = ImageCrop(img1, x, y, img2->width, img2->height);
+  if (img_cropped != img2) match = 0;
+  ImageDestroy(&img_cropped);
+  */
+  return match;
+
 }
 
 /// Locate a subimage inside another image.
