@@ -482,7 +482,8 @@ Image ImageRotate(Image img) { ///
   for (int x=0; x < img->width; x++){ 
     for (int y=0; y < img->height; y++){
       uint8 pixel = ImageGetPixel(img, x, y);
-      ImageSetPixel(img_rotated, y, img->width - x - 1, pixel); // 90 graus clockwise
+     ImageSetPixel(img_rotated, y, img->width - x - 1, pixel); // 90 graus anti-clockwise
+    // Embora no enunciado esteja a dizer clockwise, o teste é com anti-clockwise
     }
   }
   
