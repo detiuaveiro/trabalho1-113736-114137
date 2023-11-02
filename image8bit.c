@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include "instrumentation.h"
 
+
 // The data structure
 //
 // An image is stored in a structure containing 3 fields:
@@ -355,7 +356,7 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert(x >= 0 && y >= 0);
   // (x,y) -> canto superior esquerdo
   // (x+w,y+h) -> canto inferior direito do retangulo
-  return (x + w > img->width || y + h > img->height); //  1 -> está dentro da imagem, 0 -> não está
+  return (x + w <= img->width && y + h <= img->height); //  1 -> está dentro da imagem, 0 -> não está
 }
 
 /// Pixel get & set operations
@@ -507,6 +508,7 @@ Image ImageMirror(Image img) { ///
     }
     
   }
+  return img_mirrored;
 }
 
 /// Crop a rectangular subimage from img.
