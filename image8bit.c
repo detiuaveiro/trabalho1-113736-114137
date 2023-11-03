@@ -635,27 +635,43 @@ void ImageBlur(Image img, int dx, int dy) {
   assert(dx >= 0 && dy >= 0);
   //written by us
 
-  // criação da nova imagem
-  Image img_blurred = ImageCreate(img->width, img->height, img->maxval);
+    int width = img->width;
+  int height = img->height;
 
-  // percorrer linhas e colunas
-  for (int x = 0; x < img->width; x++) {
-    for (int y = 0; y < img->height; y++) {
+  Image blurredImg = ImageCreate(width, height, img->maxval);
+
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
       int sum = 0;
       int count = 0;
-      for (int x_cord = x - dx; x_cord <= x + dx; x_cord++) {
-        for (int y_cord = y - dy; y_cord <= y + dy; y_cord++) {
-          if (ImageValidPos(img, x_cord, y_cord)) {
-            sum += ImageGetPixel(img, x_cord, y_cord);
+
+      for (int i = -dx; i <= dx; i++) {
+        for (int j = -dy; j <= dy; j++) {
+          int newX = x + i;
+          int newY = y + j;
+
+          if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
+            sum += ImageGetPixel(img, newX, newY);
             count++;
           }
         }
       }
-      
-      uint8 new_pixel = (uint8)((sum + count / 2) / count); //arredondar
-      ImageSetPixel(img_blurred, x, y, new_pixel);
+
+      int meanValue = (int)(sum / (double)count + 0.5); // Rounding correction
+      ImageSetPixel(blurredImg, x, y, meanValue);
     }
   }
+
+  // Copy the blurred image back to the original image
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+      ImageSetPixel(img, x, y, ImageGetPixel(blurredImg, x, y));
+    }
+  }
+
+  // Cleanup the blurred image
+  ImageDestroy(&blurredImg);
+  
 }
 
 
