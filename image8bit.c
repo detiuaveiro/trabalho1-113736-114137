@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "instrumentation.h"
-#include <math.h>
 
 
 // The data structure
@@ -448,7 +447,7 @@ void ImageBrighten(Image img, double factor) { ///
     PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
     double new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
     if (new_pixel > (double)maxval) img->pixel[i] = maxval; // Saturar
-    else img->pixel[i] = round(new_pixel); // Não saturar
+    else img->pixel[i] = new_pixel + 0.5; // Não saturar (0.5 é para arredondar)
   }
 }
 
@@ -567,20 +566,21 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
 /// Requires: img2 must fit inside img1 at position (x, y).
 /// alpha usually is in [0.0, 1.0], but values outside that interval
 /// may provide interesting effects.  Over/underflows should saturate.
-void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
+void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Written by us
-  for (int x_cord=x; x_cord < x + img2->width; x_cord++){  
-    for (int y_cord=y; y_cord < y + img2->height; y_cord++){
+  for (int x_cord = x; x_cord < x + img2->width; x_cord++) {
+    for (int y_cord = y; y_cord < y + img2->height; y_cord++) {
       uint8 pixel1 = ImageGetPixel(img1, x_cord, y_cord);
-      uint8 pixel2 = ImageGetPixel(img2, x_cord-x, y_cord-y);
-      uint8 new_pixel = pixel1 * (1 - alpha) + pixel2 * alpha;
+      uint8 pixel2 = ImageGetPixel(img2, x_cord - x, y_cord - y);
+      uint8 new_pixel = (uint8)(pixel1 * (1 - alpha) + pixel2 * alpha + 0.5); // arredondar
       ImageSetPixel(img1, x_cord, y_cord, new_pixel);
     }
   }
 }
+
 
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
@@ -631,29 +631,32 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// Each pixel is substituted by the mean of the pixels in the rectangle
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
-void ImageBlur(Image img, int dx, int dy) { ///
-  // Written by us
-  assert (img != NULL);
-  assert (dx >= 0 && dy >= 0);
-    // Criação da nova imagem
+void ImageBlur(Image img, int dx, int dy) {
+  assert(img != NULL);
+  assert(dx >= 0 && dy >= 0);
+  //written by us
+
+  // criação da nova imagem
   Image img_blurred = ImageCreate(img->width, img->height, img->maxval);
 
-  // Percorrer linhas & colunas
-  for (int x=0; x < img->width; x++){ 
-    for (int y=0; y < img->height; y++){
+  // percorrer linhas e colunas
+  for (int x = 0; x < img->width; x++) {
+    for (int y = 0; y < img->height; y++) {
       int sum = 0;
       int count = 0;
-      for (int x_cord=x-dx; x_cord <= x+dx; x_cord++){  // Percorrer o retângulo
-        for (int y_cord=y-dy; y_cord <= y+dy; y_cord++){
-          if (ImageValidPos(img, x_cord, y_cord)){
+      for (int x_cord = x - dx; x_cord <= x + dx; x_cord++) {
+        for (int y_cord = y - dy; y_cord <= y + dy; y_cord++) {
+          if (ImageValidPos(img, x_cord, y_cord)) {
             sum += ImageGetPixel(img, x_cord, y_cord);
             count++;
           }
         }
       }
-      uint8 new_pixel = sum / count; // Média dos pixeis
+      
+      uint8 new_pixel = (uint8)((sum + count / 2) / count); //arredondar
       ImageSetPixel(img_blurred, x, y, new_pixel);
     }
   }
 }
+
 
