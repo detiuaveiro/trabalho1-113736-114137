@@ -446,8 +446,8 @@ void ImageBrighten(Image img, double factor) { ///
   for (int i=0; i < size; i++){
     PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
     double new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
-    if (new_pixel > (double)maxval) img->pixel[i] = maxval; // Saturar
-    else img->pixel[i] = new_pixel + 0.5; // Não saturar (0.5 é para arredondar)
+    if (new_pixel > maxval) img->pixel[i] = maxval; // Saturar
+    else img->pixel[i] = (int)(new_pixel + 0.5); // Não saturar (0.5 é para arredondar)
   }
 }
 
@@ -575,7 +575,9 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
     for (int y_cord = y; y_cord < y + img2->height; y_cord++) {
       uint8 pixel1 = ImageGetPixel(img1, x_cord, y_cord);
       uint8 pixel2 = ImageGetPixel(img2, x_cord - x, y_cord - y);
-      uint8 new_pixel = (uint8)(pixel1 * (1 - alpha) + pixel2 * alpha + 0.5); // arredondar
+      double new_pixel = (int)(pixel1 * (1 - alpha) + pixel2 * alpha + 0.5); // arredondar
+      if (new_pixel > img1->maxval) new_pixel = img1->maxval; // Saturar
+      if (new_pixel < 0) new_pixel = 0; // Saturar
       ImageSetPixel(img1, x_cord, y_cord, new_pixel);
     }
   }
