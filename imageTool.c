@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <error.h>
+#include "error.h"
 #include <assert.h>
 
 #include "image8bit.h"
@@ -86,6 +86,7 @@ static char* errors[] = {
 // add new operations for that purpose.
 
 int main(int ac, char* av[]) {
+  program_name = av[0];
   if (ac <= 1) {
     error(5, 0, "\n%s", USAGE);
   }

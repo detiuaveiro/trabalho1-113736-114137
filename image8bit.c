@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include "instrumentation.h"
 
-
 // The data structure
 //
 // An image is stored in a structure containing 3 fields:
@@ -168,7 +167,6 @@ void ImageInit(void) { ///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
-
 Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (width >= 0);
   assert (height >= 0);
@@ -467,7 +465,7 @@ void ImageBrighten(Image img, double factor) { ///
 
 /// Rotate an image.
 /// Returns a rotated version of the image.
-/// The rotation is 90 degrees clockwise.
+/// The rotation is 90 degrees anti-clockwise.
 /// Ensures: The original img is not modified.
 /// 
 /// On success, a new image is returned.
@@ -483,7 +481,6 @@ Image ImageRotate(Image img) { ///
     for (int y=0; y < img->height; y++){
       uint8 pixel = ImageGetPixel(img, x, y);
      ImageSetPixel(img_rotated, y, img->width - x - 1, pixel); // 90 graus anti-clockwise
-    // Embora no enunciado esteja a dizer clockwise, o teste é com anti-clockwise
     }
   }
   
