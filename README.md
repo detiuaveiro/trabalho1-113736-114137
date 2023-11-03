@@ -70,7 +70,7 @@ atualizar repositório base (upstream) deste projeto.
 Se isso acontecer, deverá atualizar o seu repositório com os seguintes comandos:
 
 ```bash
-git remote add upstream [mailto:git@github.com:detiuaveiro/image8bit-pub.git]git@github.com:detiuaveiro/image8bit-pub.git
+git remote add upstream git@github.com:detiuaveiro/image8bit-pub.git
 
 git fetch upstream
 git checkout main
