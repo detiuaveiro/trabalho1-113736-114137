@@ -635,43 +635,85 @@ void ImageBlur(Image img, int dx, int dy) {
   assert(dx >= 0 && dy >= 0);
   //written by us
 
-    int width = img->width;
+  int width = img->width;
   int height = img->height;
 
-  Image blurredImg = ImageCreate(width, height, img->maxval);
+  Image img_blurred = ImageCreate(width, height, img->maxval);
 
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
       int sum = 0;
       int count = 0;
 
-      for (int i = -dx; i <= dx; i++) {
-        for (int j = -dy; j <= dy; j++) {
-          int newX = x + i;
-          int newY = y + j;
-
-          if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-            sum += ImageGetPixel(img, newX, newY);
+      for (int x_cord = x - dx; x_cord <= x + dx; x_cord++) {
+        for (int y_cord = y - dy; y_cord <= y + dy; y_cord++) {
+          if (ImageValidPos(img, x_cord, y_cord)) {
+            sum += ImageGetPixel(img, x_cord, y_cord);
             count++;
           }
         }
       }
 
-      int meanValue = (int)(sum / (double)count + 0.5); // Rounding correction
-      ImageSetPixel(blurredImg, x, y, meanValue);
+      uint8 new_pixel = (uint8)((sum + count / 2) / count); // Rounding correction
+      ImageSetPixel(img_blurred, x, y, new_pixel);
     }
   }
 
   // Copy the blurred image back to the original image
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
-      ImageSetPixel(img, x, y, ImageGetPixel(blurredImg, x, y));
+      ImageSetPixel(img, x, y, ImageGetPixel(img_blurred, x, y));
     }
   }
 
   // Cleanup the blurred image
-  ImageDestroy(&blurredImg);
+  ImageDestroy(&img_blurred);
   
 }
 
+// Outra versão do código:
+
+// void ImageBlur(Image img, int dx, int dy) {
+//   assert(img != NULL);
+//   assert(dx >= 0 && dy >= 0);
+//   //written by us
+
+// int width = img->width;
+//   int height = img->height;
+
+//   Image blurredImg = ImageCreate(width, height, img->maxval);
+
+//   for (int x = 0; x < width; x++) {
+//     for (int y = 0; y < height; y++) {
+//       int sum = 0;
+//       int count = 0;
+
+//       for (int i = -dx; i <= dx; i++) {
+//         for (int j = -dy; j <= dy; j++) {
+//           int newX = x + i;
+//           int newY = y + j;
+
+//           if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
+//             sum += ImageGetPixel(img, newX, newY);
+//             count++;
+//           }
+//         }
+//       }
+
+//       int meanValue = (int)(sum / (double)count + 0.5); // Rounding correction
+//       ImageSetPixel(blurredImg, x, y, meanValue);
+//     }
+//   }
+
+//   // Copy the blurred image back to the original image
+//   for (int x = 0; x < width; x++) {
+//     for (int y = 0; y < height; y++) {
+//       ImageSetPixel(img, x, y, ImageGetPixel(blurredImg, x, y));
+//     }
+//   }
+
+//   // Cleanup the blurred image
+//   ImageDestroy(&blurredImg);
+  
+// }
 
