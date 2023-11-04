@@ -2,6 +2,9 @@
 
 Este é o código-fonte para o primeiro projeto de AED 2023-2024.
 
+## Relatório
+[Relatório](https://uapt33090-my.sharepoint.com/:w:/g/personal/raquelvinagre_ua_pt/EcR63dF8OUVJnSbDMUyzQDYBQIKODndapcDy3vLkHjvrqA?e=FhowFi)
+
 ## Ficheiros
 
 - `image8bit.c` - implementação do módulo (a COMPLETAR)
