@@ -665,7 +665,7 @@ void ImageBlur(Image img, int dx, int dy) {
       }
 
       int pixelIndex = y * width + x;
-      blurredPixels[pixelIndex] = (uint8)((sum + (count >> 1)) / count); // Use bitwise shift instead of division
+      blurredPixels[pixelIndex] = (uint8)((sum + (count >> 1)) / count); // Pega o SRL
       PIXMEM += 1;
     }
   }
