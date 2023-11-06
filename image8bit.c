@@ -633,11 +633,9 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 void ImageBlur(Image img, int dx, int dy) {
   assert(img != NULL);
   assert(dx >= 0 && dy >= 0);
-  //written by us
-
+  // Written by us
   int width = img->width;
   int height = img->height;
-  int size = width * height;
 
   Image img_blurred = ImageCreate(width, height, img->maxval);
 
@@ -657,25 +655,79 @@ void ImageBlur(Image img, int dx, int dy) {
             int newX = x + i;
 
             if (newX >= 0 && newX < width) {
-              sum += originalPixels[newY * width + newX];
+              int pixelIndex = newY * width + newX;
+              sum += originalPixels[pixelIndex];
               count++;
+              PIXMEM += 1;
             }
           }
         }
       }
 
-      blurredPixels[y * width + x] = (uint8)((sum + count / 2) / count);
+      int pixelIndex = y * width + x;
+      blurredPixels[pixelIndex] = (uint8)((sum + (count >> 1)) / count); // Use bitwise shift instead of division
+      PIXMEM += 1;
     }
   }
 
-  // Copy the blurred image back to the original image
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < width * height; i++) {
     originalPixels[i] = blurredPixels[i];
+    PIXMEM += 1;
   }
 
-  // Cleanup the blurred image
   ImageDestroy(&img_blurred);
 }
+
+// Melhor versão sem ser a de cima:
+
+// void ImageBlur(Image img, int dx, int dy) {
+//   assert(img != NULL);
+//   assert(dx >= 0 && dy >= 0);
+//   //written by us
+
+//   int width = img->width;
+//   int height = img->height;
+//   int size = width * height;
+
+//   Image img_blurred = ImageCreate(width, height, img->maxval);
+
+//   uint8* blurredPixels = img_blurred->pixel;
+//   uint8* originalPixels = img->pixel;
+
+//   for (int y = 0; y < height; y++) {
+//     for (int x = 0; x < width; x++) {
+//       int sum = 0;
+//       int count = 0;
+
+//       for (int j = -dy; j <= dy; j++) {
+//         int newY = y + j;
+
+//         if (newY >= 0 && newY < height) {
+//           for (int i = -dx; i <= dx; i++) {
+//             int newX = x + i;
+
+//             if (newX >= 0 && newX < width) {
+//               sum += originalPixels[newY * width + newX];
+//               count++;
+//             }
+//           }
+//         }
+//       }
+
+//       blurredPixels[y * width + x] = (uint8)((sum + count / 2) / count);
+//     }
+//   }
+
+//   // Copy the blurred image back to the original image
+//   for (int i = 0; i < size; i++) {
+//     originalPixels[i] = blurredPixels[i];
+//   }
+
+//   // Cleanup the blurred image
+//   ImageDestroy(&img_blurred);
+// }
+
+
 
 // Outra versão do código:
 
