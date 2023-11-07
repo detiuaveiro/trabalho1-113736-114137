@@ -335,9 +335,8 @@ void ImageStats(Image img, uint8* min, uint8* max) { ///
   // Percorrer o array para dar Update caso necessário
   for (int i=0; i < size; i++){
     uint8 pixel_val = img->pixel[i];
-    if (pixel_val < *min) *min = pixel_val; // Update no min
-    if (pixel_val > *max) *max = pixel_val; // Update no max
-    PIXMEM +=2; 
+    if (pixel_val < *min) {*min = pixel_val; PIXMEM+=1;} // Update no min
+    if (pixel_val > *max) {*max = pixel_val; PIXMEM+=1;} // Update no max
   }
   
 }
@@ -347,6 +346,7 @@ int ImageValidPos(Image img, int x, int y) { ///
   assert (img != NULL);
   return (0 <= x && x < img->width) && (0 <= y && y < img->height);
 }
+
 
 /// Check if rectangular area (x,y,w,h) is completely inside img.
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
@@ -413,7 +413,7 @@ void ImageNegative(Image img) { ///
   uint8 maxval = img->maxval;
   // Percorrer o array de pixeis e aplicar a transformação
   for (int i=0; i < size; i++){
-    PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
+    PIXMEM += 1; 
     img->pixel[i] = maxval - img->pixel[i]; // Aplicar a transformação
   }
 }
@@ -426,7 +426,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
   //Written by us
   int size = img->width * img->height;
   for (int i=0; i < size; i++){
-    PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
+    PIXMEM += 1;  
     if (img->pixel[i] < thr) img->pixel[i] = 0; // Se < thr -> preto
     else img->pixel[i] = img->maxval; // Se >= thr -> branco
   }
@@ -444,11 +444,15 @@ void ImageBrighten(Image img, double factor) { ///
   uint8 maxval = img->maxval;
   // Percorrer o array de pixeis e aplicar a transformação
   for (int i=0; i < size; i++){
-    PIXMEM += 1;  // acesso a um pixel
     double new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
-    if (new_pixel > maxval) img->pixel[i] = maxval; // Saturar
-    else img->pixel[i] = (int)(new_pixel + 0.5); // Não saturar (0.5 é para arredondar)
-  }
+    PIXMEM+=1; 
+    if (new_pixel > maxval) {
+        img->pixel[i] = maxval;PIXMEM+=1; // Saturar
+        }
+      else {
+        img->pixel[i] = (int)(new_pixel + 0.5); PIXMEM+=1; // Não saturar (0.5 é para arredondar)
+        } 
+    }
 }
 
 
@@ -573,9 +577,10 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
     for (int y_cord = y; y_cord < y + img2->height; y_cord++) {
       uint8 pixel1 = ImageGetPixel(img1, x_cord, y_cord);
       uint8 pixel2 = ImageGetPixel(img2, x_cord - x, y_cord - y);
-      double new_pixel = (int)(pixel1 * (1 - alpha) + pixel2 * alpha + 0.5); // arredondar
-      PIXMEM +=1;
-      if (new_pixel > img1->maxval) new_pixel = img1->maxval; // Saturar
+      double new_pixel = (int)(pixel1 * (1 - alpha) + pixel2 * alpha + 0.5); // Arredondar
+      if (new_pixel > img1->maxval) {
+        new_pixel = img1->maxval;PIXMEM +=1; // Saturar
+        } 
       if (new_pixel < 0) new_pixel = 0; // Saturar
       ImageSetPixel(img1, x_cord, y_cord, new_pixel);
     }
@@ -646,9 +651,7 @@ void ImageBlur(Image img, int dx, int dy) {
   // }
   uint8* blurredPixels = (uint8*)calloc(size, sizeof(uint8));//usar isto na image create
 
-
   uint8* originalPixels = img->pixel;
-  PIXMEM +=1; //??? not sure
 
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
@@ -678,18 +681,11 @@ void ImageBlur(Image img, int dx, int dy) {
     }
   }
 
-  // uint8* temp = img->pixel;
-  // img->pixel = img_blurred->pixel;
-  // img_blurred->pixel = temp;
-  // // Cleanup the blurred image without freeing its pixel buffer
-  // img_blurred->pixel = NULL;  // Avoid double-free
- 
   for (int i = 0; i < width * height; i++) {
     originalPixels[i] = blurredPixels[i];
     PIXMEM += 1;
   }
   free(blurredPixels);
-  // ImageDestroy(&img_blurred);
 }
 
 // Melhor versão sem ser a de cima:
