@@ -636,10 +636,16 @@ void ImageBlur(Image img, int dx, int dy) {
   // Written by us
   int width = img->width;
   int height = img->height;
+  int size = width * height;
 
-  Image img_blurred = ImageCreate(width, height, img->maxval);
+  // Image img_blurred = ImageCreate(width, height, img->maxval);
+  // uint8* blurredPixels = (uint8*)malloc(width*height*sizeof(uint8));
+  // for (int i = 0; i < size; i++){
+  //   blurredPixels[i] = 0;
+  // }
+  uint8* blurredPixels = (uint8*)calloc(size, sizeof(uint8));//usar isto na image create
 
-  uint8* blurredPixels = img_blurred->pixel;
+
   uint8* originalPixels = img->pixel;
 
   for (int y = 0; y < height; y++) {
@@ -670,12 +676,18 @@ void ImageBlur(Image img, int dx, int dy) {
     }
   }
 
+  // uint8* temp = img->pixel;
+  // img->pixel = img_blurred->pixel;
+  // img_blurred->pixel = temp;
+  // // Cleanup the blurred image without freeing its pixel buffer
+  // img_blurred->pixel = NULL;  // Avoid double-free
+ 
   for (int i = 0; i < width * height; i++) {
     originalPixels[i] = blurredPixels[i];
     PIXMEM += 1;
   }
-
-  ImageDestroy(&img_blurred);
+  free(blurredPixels);
+  // ImageDestroy(&img_blurred);
 }
 
 // Melhor versão sem ser a de cima:
