@@ -504,7 +504,6 @@ Image ImageMirror(Image img) { ///
       uint8 pixel = ImageGetPixel(img, x, y);
       ImageSetPixel(img_mirrored, img->width - x - 1, y, pixel); // Mirror/Flip left-right
     }
-    
   }
   return img_mirrored;
 }
