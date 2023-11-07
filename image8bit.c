@@ -329,13 +329,15 @@ void ImageStats(Image img, uint8* min, uint8* max) { ///
 
   // Inicializar min e max
   *min = img->pixel[0];
-  *max = img->pixel[0]; 
+  *max = *min;
+  PIXMEM +=1;
 
   // Percorrer o array para dar Update caso necessário
   for (int i=0; i < size; i++){
     uint8 pixel_val = img->pixel[i];
     if (pixel_val < *min) *min = pixel_val; // Update no min
     if (pixel_val > *max) *max = pixel_val; // Update no max
+    PIXMEM +=2; 
   }
   
 }
@@ -442,7 +444,7 @@ void ImageBrighten(Image img, double factor) { ///
   uint8 maxval = img->maxval;
   // Percorrer o array de pixeis e aplicar a transformação
   for (int i=0; i < size; i++){
-    PIXMEM += 1;  // acesso a um pixel, not sure se é necessário
+    PIXMEM += 1;  // acesso a um pixel
     double new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
     if (new_pixel > maxval) img->pixel[i] = maxval; // Saturar
     else img->pixel[i] = (int)(new_pixel + 0.5); // Não saturar (0.5 é para arredondar)
@@ -478,7 +480,7 @@ Image ImageRotate(Image img) { ///
   Image img_rotated = ImageCreate(img->height, img->width, img->maxval); 
   // Percorrer linhas & colunas
   for (int x=0; x < img->width; x++){ 
-    for (int y=0; y < img->height; y++){
+    for (int y=0; y < img->height; y++){ //aqui não é preciso o Pixmem++, pois já é contado nas funções chamadas
       uint8 pixel = ImageGetPixel(img, x, y);
      ImageSetPixel(img_rotated, y, img->width - x - 1, pixel); // 90 graus anti-clockwise
     }
@@ -572,6 +574,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
       uint8 pixel1 = ImageGetPixel(img1, x_cord, y_cord);
       uint8 pixel2 = ImageGetPixel(img2, x_cord - x, y_cord - y);
       double new_pixel = (int)(pixel1 * (1 - alpha) + pixel2 * alpha + 0.5); // arredondar
+      PIXMEM +=1;
       if (new_pixel > img1->maxval) new_pixel = img1->maxval; // Saturar
       if (new_pixel < 0) new_pixel = 0; // Saturar
       ImageSetPixel(img1, x_cord, y_cord, new_pixel);
@@ -609,17 +612,16 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   // Written by us
-  int match = 0;
   for (int x=0; x < img1->width - img2->width; x++){  
     for (int y=0; y < img1->height - img2->height; y++){
       if (ImageMatchSubImage(img1, x, y, img2)){
         *px = x;
         *py = y;
-        match = 1;
+        return 1;
       }
     }
   }
-  return match;
+  return 0;
 }
 
 
@@ -646,6 +648,7 @@ void ImageBlur(Image img, int dx, int dy) {
 
 
   uint8* originalPixels = img->pixel;
+  PIXMEM +=1; //??? not sure
 
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
