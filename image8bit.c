@@ -621,8 +621,10 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
   assert(img1 != NULL);
   assert(img2 != NULL);
   // Written by us
-  for (int x = 0; x < img1->width - img2->width; x++) {
-    for (int y = 0; y < img1->height - img2->height; y++) {
+  int x_space = img1->width-img2->width; //the space left between the two images in the x axis
+  int y_space = img1->height-img2->height; //the space left between the two images in the y axis
+  for (int x = 0; x < x_space; x++) {
+    for (int y = 0; y < y_space; y++) {
       if (ImageMatchSubImage(img1, x, y, img2)) {
         *px = x;
         *py = y;
