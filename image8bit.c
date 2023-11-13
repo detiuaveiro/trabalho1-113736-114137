@@ -168,17 +168,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   // Written by us
 
   Image img = NULL; // Define uma variável do tipo Image
-  int success = // Verifica se a criação da imagem foi bem sucedida (1) ou não
-                // (0)
+  int success = // Verifica se a criação da imagem foi bem sucedida (1) ou não (0)
       // Alocação de memória para a imagem e para o array de pixeis
-      check((img = (Image)malloc(sizeof(struct image))) != NULL,
-            "Allocation failed") &&
-      check((img->pixel = (uint8 *)calloc(width * height, sizeof(uint8))) !=
-                NULL,
-            "Allocation failed");
-  PIXMEM += (unsigned long)(width * height); // Acrescenta o número de pixeis à
-                                             // variável PIXMEM
-  // não tenho a ctz q é necessário colocar aqui pois na ImageSave já tem
+      check((img = (Image)malloc(sizeof(struct image))) != NULL, "Allocation failed") &&
+      check((img->pixel = (uint8 *)calloc(width * height, sizeof(uint8))) != NULL,"Allocation failed");
 
   // Alocar o conteúdo
   img->width = width;
@@ -451,11 +444,13 @@ void ImageBrighten(Image img, double factor) { ///
     double new_pixel = img->pixel[i] * factor; // multiplicar pelo fator
     PIXMEM += 1;
     if (new_pixel > maxval) {
+      // Saturar
       img->pixel[i] = maxval;
-      PIXMEM += 1; // Saturar
+      PIXMEM += 1; 
     } else {
+      // Não saturar (0.5 é para arredondar)
       img->pixel[i] = (int)(new_pixel + 0.5);
-      PIXMEM += 1; // Não saturar (0.5 é para arredondar)
+      PIXMEM += 1; 
     }
   }
 }
@@ -652,13 +647,7 @@ void ImageBlur(Image img, int dx, int dy) {
   int height = img->height;
   int size = width * height;
 
-  // Image img_blurred = ImageCreate(width, height, img->maxval);
-  // uint8* blurredPixels = (uint8*)malloc(width*height*sizeof(uint8));
-  // for (int i = 0; i < size; i++){
-  //   blurredPixels[i] = 0;
-  // }
-  uint8 *blurredPixels =
-      (uint8 *)calloc(size, sizeof(uint8)); // usar isto na image create
+  uint8 *blurredPixels = (uint8 *)calloc(size, sizeof(uint8)); // usar isto na image create
 
   uint8 *originalPixels = img->pixel;
 
@@ -675,18 +664,20 @@ void ImageBlur(Image img, int dx, int dy) {
             int newX = x + i;
 
             if (newX >= 0 && newX < width) {
-              int pixelIndex = newY * width + newX;
-              sum += originalPixels[pixelIndex];
+              // int pixelIndex = newY * width + newX;
+              // sum += originalPixels[pixelIndex];
+              // PIXMEM += 1;
+              sum += ImageGetPixel(img,newX,newY);
               count++;
-              PIXMEM += 1;
             }
           }
         }
       }
 
       int pixelIndex = y * width + x;
-      blurredPixels[pixelIndex] =
-          (uint8)((sum + (count >> 1)) / count); // Pega o SRL
+      // blurredPixels[pixelIndex] =
+      //     (uint8)((sum + (count >> 1)) / count); // Pega o SRL
+      *(blurredPixels + pixelIndex) = (uint8)((sum + (count >> 1)) / count); // Pega o SRL
       PIXMEM += 1;
     }
   }
@@ -696,7 +687,44 @@ void ImageBlur(Image img, int dx, int dy) {
     PIXMEM += 1;
   }
   free(blurredPixels);
+  printf("PIXMEM: %ld",PIXMEM);
 }
+
+
+
+// void ImageBlur(Image img, int dx, int dy) {
+//   assert(img != NULL);
+//   assert(dx >= 0);
+//   assert(dy >= 0);
+
+//   Image img1 = ImageCreate(img->width, img->height, img->maxval);
+//   int x, y;
+//   int h = img->height;
+//   int w = img->width;
+//   for (y = 0; y < h; y++) {
+//     for (x = 0; x < w; x++) {
+//       double sum = 0.0;
+//       double count = 0.0;
+//       int i, j;
+//       for (j = y - dy; j <= y + dy; j++) {
+//         for (i = x - dx; i <= x + dx; i++) {
+//           if (ImageValidPos(img, i, j)) {
+//             sum += (ImageGetPixel(img, i, j));
+//             count++;
+//           }
+//         }
+//       }
+//       ImageSetPixel(img1, x, y, (int)(sum / count + 0.5));
+//     }
+//   }
+//   for (y = 0; y < h; y++) {
+//     for (x = 0; x < w; x++) {
+//       ImageSetPixel(img, x, y, ImageGetPixel(img1, x, y));
+//     }
+//   }
+//   free(img1);
+//   printf("PIXMEM: %ld",PIXMEM);
+// }
 
 // Melhor versão sem ser a de cima:
 
@@ -729,22 +757,26 @@ void ImageBlur(Image img, int dx, int dy) {
 //             if (newX >= 0 && newX < width) {
 //               sum += originalPixels[newY * width + newX];
 //               count++;
+//               PIXMEM++;
 //             }
 //           }
 //         }
 //       }
 
 //       blurredPixels[y * width + x] = (uint8)((sum + count / 2) / count);
+//               PIXMEM++;
 //     }
 //   }
 
 //   // Copy the blurred image back to the original image
 //   for (int i = 0; i < size; i++) {
 //     originalPixels[i] = blurredPixels[i];
+//     PIXMEM++;
 //   }
 
 //   // Cleanup the blurred image
 //   ImageDestroy(&img_blurred);
+//   printf("PIXMEM: %ld",PIXMEM);
 // }
 
 // Outra versão do código:
