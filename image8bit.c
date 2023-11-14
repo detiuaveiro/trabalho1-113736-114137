@@ -688,7 +688,7 @@ void ImageBlur(Image img, int dx, int dy) {
     originalPixels[i] = blurredPixels[i];
     PIXMEM += 1;
   }
-  // memcpy(originalPixels, blurredPixels, size * sizeof(uint8));
+  // memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); // seria necessario um header file a mais
   free(blurredPixels);
   printf("PIXMEM: %ld",PIXMEM);
 }
