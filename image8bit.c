@@ -595,7 +595,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
-int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
+int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
   assert(img1 != NULL);
   assert(img2 != NULL);
   assert(ImageValidPos(img1, x, y));
@@ -607,7 +607,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       uint8 pixel1 = ImageGetPixel(img1, x_cord, y_cord);
       uint8 pixel2 = ImageGetPixel(img2, x_cord - x, y_cord - y);
       if (pixel1 != pixel2)
-        return 0; // Para nao ser necessário percorrer o loop todo
+        return 0; // Para não ser necessário percorrer o loop todo
     }
   }
   return 1; // caso sejam todos iguais
