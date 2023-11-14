@@ -657,7 +657,7 @@ void ImageBlur(Image img, int dx, int dy) {
     for (int x = 0; x < width; x++) {
       int sum = 0;
       int count = 0;
-
+  
       for (int j = -dy; j <= dy; j++) {
         int newY = y + j;
 
@@ -677,16 +677,15 @@ void ImageBlur(Image img, int dx, int dy) {
       }
 
       int pixelIndex = y * width + x;
-      // blurredPixels[pixelIndex] =
-      //     (uint8)((sum + (count >> 1)) / count); // Pega o SRL
-      *(blurredPixels + pixelIndex) = (uint8)((sum + (count >> 1)) / count); // Pega o SRL
-      // PIXMEM += 1;
+      // (sum + count/2) / count  , isto para não ter de usar sum e count como doubles
+      // escolhemos fazer o cálculo desta forma para ser mais eficiente do que usar "floating-point arithmetic"
+      *(blurredPixels + pixelIndex) = (uint8)((sum + (count >> 1)) / count);
     }
   }
 
   for (int i = 0; i < size; i++) {
     originalPixels[i] = blurredPixels[i];
-    PIXMEM += 1;
+    PIXMEM++;
   }
   // memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); // seria necessario um header file a mais
   free(blurredPixels);
