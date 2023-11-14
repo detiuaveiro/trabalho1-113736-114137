@@ -10,8 +10,8 @@
 /// 2013, 2023
 
 // Student authors (fill in below):
-// NMec:  Name:
-//
+// NMec: 114137  Name: Diogo Fernandes
+// NMec: 113736  Name: Raquel Vinagre
 //
 //
 // Date:
@@ -680,14 +680,15 @@ void ImageBlur(Image img, int dx, int dy) {
       // blurredPixels[pixelIndex] =
       //     (uint8)((sum + (count >> 1)) / count); // Pega o SRL
       *(blurredPixels + pixelIndex) = (uint8)((sum + (count >> 1)) / count); // Pega o SRL
-      PIXMEM += 1;
+      // PIXMEM += 1;
     }
   }
 
-  for (int i = 0; i < width * height; i++) {
+  for (int i = 0; i < size; i++) {
     originalPixels[i] = blurredPixels[i];
     PIXMEM += 1;
   }
+  // memcpy(originalPixels, blurredPixels, size * sizeof(uint8));
   free(blurredPixels);
   printf("PIXMEM: %ld",PIXMEM);
 }
