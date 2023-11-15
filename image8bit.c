@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // The data structure
 //
@@ -683,11 +684,8 @@ void ImageBlur(Image img, int dx, int dy) {
     }
   }
 
-  for (int i = 0; i < size; i++) {
-    originalPixels[i] = blurredPixels[i];
-    PIXMEM++;
-  }
-  // memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); // seria necessario um header file a mais
+  memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); // seria necessario um header file a mais
+  PIXMEM+=size;
   free(blurredPixels);
   printf("PIXMEM: %ld",PIXMEM);
 }
