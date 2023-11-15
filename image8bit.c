@@ -650,7 +650,7 @@ void ImageBlur(Image img, int dx, int dy) {
   int height = img->height;
   int size = width * height;
 
-  uint8 *blurredPixels = (uint8 *)calloc(size, sizeof(uint8)); // usar isto na image create
+  uint8 *blurredPixels = (uint8 *)malloc(size * sizeof(uint8));
 
   uint8 *originalPixels = img->pixel;
 
@@ -658,13 +658,13 @@ void ImageBlur(Image img, int dx, int dy) {
     for (int x = 0; x < width; x++) {
       int sum = 0;
       int count = 0;
-  
-      for (int j = -dy; j <= dy; j++) {
-        int newY = y + j;
+      int newYLim = y + dy;
+      int newXLim = x + dx;
 
+      for (int newY= y-dy; newY <= newYLim; newY++) {
         if (newY >= 0 && newY < height) {
-          for (int i = -dx; i <= dx; i++) {
-            int newX = x + i;
+
+          for (int newX = x-dx; newX <= newXLim; newX++) {
 
             if (newX >= 0 && newX < width) {
               // int pixelIndex = newY * width + newX;
@@ -689,6 +689,7 @@ void ImageBlur(Image img, int dx, int dy) {
   free(blurredPixels);
   printf("PIXMEM: %ld",PIXMEM);
 }
+
 
 
 
