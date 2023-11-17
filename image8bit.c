@@ -687,10 +687,60 @@ void ImageBlur(Image img, int dx, int dy) {
   memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); // seria necessario um header file a mais
   PIXMEM+=size;
   free(blurredPixels);
-  printf("PIXMEM: %ld",PIXMEM);
+  printf("PIXMEM: %ld\n",PIXMEM);
 }
 
 
+
+
+// void ImageBlur(Image img, int dx, int dy) {
+//   assert(img != NULL);
+//   assert(dx >= 0 && dy >= 0);
+//   // Written by us
+//   int width = img->width;
+//   int height = img->height;
+//   // int size = width * height;
+
+//   // uint8 *blurredPixels = (uint8 *)malloc(size * sizeof(uint8));
+
+//   uint8 *originalPixels = img->pixel;
+//     // 1D horizontal blur
+//     // 1D horizontal blur
+// int *temp = malloc(width * height * sizeof(int));
+
+//     // Horizontal pass
+//     for (int y = 0; y < height; y++) {
+//         for (int x = 0; x < width; x++) {
+//             double sum = 0;
+//             double count = 0;
+//             for (int i = x - dx; i <= x + dx; i++) {
+//                 if (i >= 0 && i < width) {
+//                     sum += originalPixels[y * width + i];
+//                     count++;
+//                 }
+//             }
+//             temp[y * width + x] = (int)(sum / count + 0.5);
+//         }
+//     }
+
+//     // Vertical pass
+//     for (int x = 0; x < width; x++) {
+//         for (int y = 0; y < height; y++) {
+//             double sum = 0;
+//             double count = 0;
+//             for (int j = y - dy; j <= y + dy; j++) {
+//                 if (j >= 0 && j < height) {
+//                     sum += temp[j * width + x];
+//                     count++;
+//                 }
+//             }
+//             originalPixels[y * width + x] = (int)(sum / count + 0.5);
+//         }
+//     }
+// printf("PIXEl 2500:%d ", ImageGetPixel(img,230,77));
+//     // Free temporary array
+//     free(temp);
+// }
 
 
 // void ImageBlur(Image img, int dx, int dy) {
