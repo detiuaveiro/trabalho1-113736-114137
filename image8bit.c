@@ -642,53 +642,53 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
 /// Each pixel is substituted by the mean of the pixels in the rectangle
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
-void ImageBlur(Image img, int dx, int dy) {
-  assert(img != NULL);
-  assert(dx >= 0 && dy >= 0);
-  // Written by us
-  int width = img->width;
-  int height = img->height;
-  int size = width * height;
+// void ImageBlur(Image img, int dx, int dy) {
+//   assert(img != NULL);
+//   assert(dx >= 0 && dy >= 0);
+//   // Written by us
+//   int width = img->width;
+//   int height = img->height;
+//   int size = width * height;
 
-  uint8 *blurredPixels = (uint8 *)malloc(size * sizeof(uint8));
+//   uint8 *blurredPixels = (uint8 *)malloc(size * sizeof(uint8));
 
-  uint8 *originalPixels = img->pixel;
+//   uint8 *originalPixels = img->pixel;
 
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
-      int sum = 0;
-      int count = 0;
-      int newYLim = y + dy;
-      int newXLim = x + dx;
+//   for (int y = 0; y < height; y++) {
+//     for (int x = 0; x < width; x++) {
+//       int sum = 0;
+//       int count = 0;
+//       int newYLim = y + dy;
+//       int newXLim = x + dx;
 
-      for (int newY= y-dy; newY <= newYLim; newY++) {
-        if (newY >= 0 && newY < height) {
+//       for (int newY= y-dy; newY <= newYLim; newY++) {
+//         if (newY >= 0 && newY < height) {
 
-          for (int newX = x-dx; newX <= newXLim; newX++) {
+//           for (int newX = x-dx; newX <= newXLim; newX++) {
 
-            if (newX >= 0 && newX < width) {
-              // int pixelIndex = newY * width + newX;
-              // sum += originalPixels[pixelIndex];
-              // PIXMEM += 1;
-              sum += ImageGetPixel(img,newX,newY);
-              count++;
-            }
-          }
-        }
-      }
+//             if (newX >= 0 && newX < width) {
+//               // int pixelIndex = newY * width + newX;
+//               // sum += originalPixels[pixelIndex];
+//               // PIXMEM += 1;
+//               sum += ImageGetPixel(img,newX,newY);
+//               count++;
+//             }
+//           }
+//         }
+//       }
 
-      int pixelIndex = y * width + x;
-      // (sum + count/2) / count  , isto para não ter de usar sum e count como doubles
-      // escolhemos fazer o cálculo desta forma para ser mais eficiente do que usar "floating-point arithmetic"
-      *(blurredPixels + pixelIndex) = (uint8)((sum + (count >> 1)) / count);
-    }
-  }
+//       int pixelIndex = y * width + x;
+//       // (sum + count/2) / count  , isto para não ter de usar sum e count como doubles
+//       // escolhemos fazer o cálculo desta forma para ser mais eficiente do que usar "floating-point arithmetic"
+//       *(blurredPixels + pixelIndex) = (uint8)((sum + (count >> 1)) / count);
+//     }
+//   }
 
-  memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); // seria necessario um header file a mais
-  PIXMEM+=size;
-  free(blurredPixels);
-  printf("PIXMEM: %ld\n",PIXMEM);
-}
+//   memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); // seria necessario um header file a mais
+//   PIXMEM+=size;
+//   free(blurredPixels);
+//   printf("PIXMEM: %ld\n",PIXMEM);
+// }
 
 
 
@@ -706,7 +706,7 @@ void ImageBlur(Image img, int dx, int dy) {
 //   uint8 *originalPixels = img->pixel;
 //     // 1D horizontal blur
 //     // 1D horizontal blur
-// int *temp = malloc(width * height * sizeof(int));
+//   int *temp = malloc(width * height * sizeof(int));
 
 //     // Horizontal pass
 //     for (int y = 0; y < height; y++) {
@@ -719,7 +719,7 @@ void ImageBlur(Image img, int dx, int dy) {
 //                     count++;
 //                 }
 //             }
-//             temp[y * width + x] = (int)(sum / count + 0.5);
+//             temp[y * width + x] = (sum / count);
 //         }
 //     }
 
@@ -730,17 +730,62 @@ void ImageBlur(Image img, int dx, int dy) {
 //             double count = 0;
 //             for (int j = y - dy; j <= y + dy; j++) {
 //                 if (j >= 0 && j < height) {
-//                     sum += temp[j * width + x];
+//                     sum += (int)(temp[j * width + x] +0.5);
 //                     count++;
 //                 }
 //             }
-//             originalPixels[y * width + x] = (int)(sum / count + 0.5);
+//             originalPixels[y * width + x] = t(sum / count);
 //         }
 //     }
-// printf("PIXEl 2500:%d ", ImageGetPixel(img,230,77));
 //     // Free temporary array
 //     free(temp);
 // }
+
+
+void ImageBlur(Image img, int dx, int dy) {
+    assert(img != NULL);
+    assert(dx >= 0 && dy >= 0);
+
+    int w = img->width;
+    int h = img->height;
+    int x, y;
+
+    // Sum table horizontal
+   double *sumArray = (double *)malloc(h * w * sizeof(double));
+
+// Preenchendo a matriz de soma cumulativa
+for (y = 0; y < h; y++) {
+    for (x = 0; x < w; x++) {
+        double pixelVal = ImageGetPixel(img, x, y);
+        sumArray[y * w + x] = pixelVal +
+                              (x > 0 ? sumArray[y * w + (x - 1)] : 0) +
+                              (y > 0 ? sumArray[(y - 1) * w + x] : 0) -
+                              (x > 0 && y > 0 ? sumArray[(y - 1) * w + (x - 1)] : 0);
+    }
+}
+
+// Aplicando o desfoque usando a matriz de soma cumulativa
+for (y = 0; y < h; y++) {
+    for (x = 0; x < w; x++) {
+        int x1 = (x - dx > 0) ? x - dx : 0;
+        int y1 = (y - dy > 0) ? y - dy : 0;
+        int x2 = (x + dx < w) ? x + dx : w - 1;
+        int y2 = (y + dy < h) ? y + dy : h - 1;
+
+        double area = (x2 - x1 + 1) * (y2 - y1 + 1);
+        double sum = sumArray[y2 * w + x2] -
+                     (x1 > 0 ? sumArray[y2 * w + x1 - 1] : 0) -
+                     (y1 > 0 ? sumArray[(y1 - 1) * w + x2] : 0) +
+                     (x1 > 0 && y1 > 0 ? sumArray[(y1 - 1) * w + x1 - 1] : 0);
+
+        ImageSetPixel(img, x, y, (int)(sum / area + 0.5));
+    }
+}
+
+// Free allocated memory
+free(sumArray);
+}
+
 
 
 // void ImageBlur(Image img, int dx, int dy) {
