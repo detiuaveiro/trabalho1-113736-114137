@@ -743,47 +743,62 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
 
 
 void ImageBlur(Image img, int dx, int dy) {
-    assert(img != NULL);
-    assert(dx >= 0 && dy >= 0);
+  assert(img != NULL);
+  assert(dx >= 0 && dy >= 0);
 
-    int w = img->width;
-    int h = img->height;
-    int x, y;
+  int w = img->width;
+  int h = img->height;
+  int x, y;
 
-    // Sum table horizontal
-   double *sumArray = (double *)malloc(h * w * sizeof(double));
+  const int sum_w = w + 2 * dx;
+  const int sum_h = w + 2 * dy;
 
-// Preenchendo a matriz de soma cumulativa
-for (y = 0; y < h; y++) {
-    for (x = 0; x < w; x++) {
-        double pixelVal = ImageGetPixel(img, x, y);
-        sumArray[y * w + x] = pixelVal +
-                              (x > 0 ? sumArray[y * w + (x - 1)] : 0) +
-                              (y > 0 ? sumArray[(y - 1) * w + x] : 0) -
-                              (x > 0 && y > 0 ? sumArray[(y - 1) * w + (x - 1)] : 0);
+  // Sum table horizontal
+  int *sumArray = (int *)malloc(sum_h * sum_w * sizeof(int));
+
+  const int area = (2 * dx + 1) * (2 * dy + 1);
+
+  // Preenchendo a matriz de soma cumulativa
+  for (y = 0; y < h + 2 * dy; y++) {
+    for (x = 0; x < w + 2 * dx; x++) {
+      const int x_dentro = x < dx ? 0 : (x - dx >= w ? w - 1 : x - dx);
+      const int y_dentro = y < dy ? 0 : (y - dy >= h ? h - 1 : y - dy);
+      int pixelVal = ImageGetPixel(img, x_dentro, y_dentro);
+
+      pixelVal += x > 0 ? sumArray[y * sum_w + (x - 1)] : 0;
+      pixelVal += y > 0 ? sumArray[(y - 1) * sum_w + x] : 0;
+
+      pixelVal -= x > 0 && y > 0 ? sumArray[(y - 1) * sum_w + (x - 1)] : 0;
+
+      sumArray[y * sum_w + x] = pixelVal;
     }
-}
+  }
 
-// Aplicando o desfoque usando a matriz de soma cumulativa
-for (y = 0; y < h; y++) {
+  // Aplicando o desfoque usando a matriz de soma cumulativa
+  for (y = 0; y < h; y++) {
     for (x = 0; x < w; x++) {
-        int x1 = (x - dx > 0) ? x - dx : 0;
-        int y1 = (y - dy > 0) ? y - dy : 0;
-        int x2 = (x + dx < w) ? x + dx : w - 1;
-        int y2 = (y + dy < h) ? y + dy : h - 1;
+      int x1 = x;
+      int y1 = y;
+      int x2 = x + 2 * dx;
+      int y2 = y + 2 * dy;
 
-        double area = (x2 - x1 + 1) * (y2 - y1 + 1);
-        double sum = sumArray[y2 * w + x2] -
-                     (x1 > 0 ? sumArray[y2 * w + x1 - 1] : 0) -
-                     (y1 > 0 ? sumArray[(y1 - 1) * w + x2] : 0) +
-                     (x1 > 0 && y1 > 0 ? sumArray[(y1 - 1) * w + x1 - 1] : 0);
+      // Start in bottom right corner of the sum table
+      int sum = sumArray[y2 * sum_w + x2];
+      // Remove the bottom left corner of the sum table
+      sum -= x1 > 0 ? sumArray[y2 * sum_w + (x1 - 1)] : 0;
+      // Remove the top right corner of the sum table
+      sum -= y1 > 0 ? sumArray[(y1 - 1) * sum_w + x2] : 0;
+      // Add the top left corner of the sum table.
+      // this gives us the sum at (x, y) considering the
+      // filter kernel size of (dx, dy).
+      sum += x1 > 0 && y1 > 0 ? sumArray[(y1 - 1) * sum_w + (x1 - 1)] : 0;
 
-        ImageSetPixel(img, x, y, (int)(sum / area + 0.5));
+      ImageSetPixel(img, x, y, (int)((double)sum / (double)area + 0.5));
     }
-}
+  }
 
-// Free allocated memory
-free(sumArray);
+  // Free allocated memory
+  free(sumArray);
 }
 
 
