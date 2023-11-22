@@ -593,6 +593,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
   }
 }
 
+/*
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
@@ -612,6 +613,21 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
     }
   }
   return 1; // caso sejam todos iguais
+}
+*/
+int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
+  assert(img1 != NULL);
+  assert(img2 != NULL);
+  assert(ImageValidPos(img1, x, y));
+
+  for (int y_cord = 0; y_cord < img2->height; y_cord++) {
+    // Compare entire rows at once
+    if (memcmp(&img1->pixel[G(img1, x, y + y_cord)], &img2->pixel[G(img2, 0, y_cord)], img2->width) != 0) {
+      return 0; // Rows are not equal
+    }
+  }
+
+  return 1; // All rows are equal
 }
 
 /// Locate a subimage inside another image.
@@ -758,7 +774,7 @@ void ImageBlur(Image img, int dx, int dy) {
 
   const int area = (2 * dx + 1) * (2 * dy + 1);
 
-  // Preenchendo a matriz de soma cumulativa
+  // Preencher a matriz da soma cumulativa
   for (y = 0; y < h + 2 * dy; y++) {
     for (x = 0; x < w + 2 * dx; x++) {
       const int x_dentro = x < dx ? 0 : (x - dx >= w ? w - 1 : x - dx);
@@ -774,7 +790,7 @@ void ImageBlur(Image img, int dx, int dy) {
     }
   }
 
-  // Aplicando o desfoque usando a matriz de soma cumulativa
+  // Aplicar o desfoque, ao usar a matriz da soma cumulativa
   for (y = 0; y < h; y++) {
     for (x = 0; x < w; x++) {
       int x1 = x;

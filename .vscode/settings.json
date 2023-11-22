@@ -2,5 +2,6 @@
     "files.associations": {
         "limits": "c",
         "image8bit.h": "c"
-    }
+    },
+    "workbench.sideBar.location": "right"
 }
