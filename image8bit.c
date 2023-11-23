@@ -622,6 +622,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
 
   for (int y_cord = 0; y_cord < img2->height; y_cord++) {
     // Compare entire rows at once
+    // Not sure mas acho que é preciso usar PIXMEM aqui!  
     if (memcmp(&img1->pixel[G(img1, x, y + y_cord)], &img2->pixel[G(img2, 0, y_cord)], img2->width) != 0) {
       return 0; // Rows are not equal
     }
@@ -762,37 +763,46 @@ void ImageBlur(Image img, int dx, int dy) {
   assert(img != NULL);
   assert(dx >= 0 && dy >= 0);
 
+  // Image dimensions
   int w = img->width;
   int h = img->height;
   int x, y;
 
+  // Dimensions of the summed table
   const int sum_w = w + 2 * dx;
   const int sum_h = w + 2 * dy;
 
-  // Sum table horizontal
+  // Allocate memory for the summed Table
   int *sumArray = (int *)malloc(sum_h * sum_w * sizeof(int));
-
+  
+  // Calculate the area of the filter kernel
   const int area = (2 * dx + 1) * (2 * dy + 1);
 
-  // Preencher a matriz da soma cumulativa
+
+  // Computing the summed Table
   for (y = 0; y < h + 2 * dy; y++) {
     for (x = 0; x < w + 2 * dx; x++) {
+      // Coordinates inside the original image
       const int x_dentro = x < dx ? 0 : (x - dx >= w ? w - 1 : x - dx);
       const int y_dentro = y < dy ? 0 : (y - dy >= h ? h - 1 : y - dy);
-      int pixelVal = ImageGetPixel(img, x_dentro, y_dentro);
 
+      // Pixel value at the calculated coordinates
+      int pixelVal = ImageGetPixel(img, x_dentro, y_dentro);
+    
+      // Adding the values from left and above,subrtract the overlapping corner
       pixelVal += x > 0 ? sumArray[y * sum_w + (x - 1)] : 0;
       pixelVal += y > 0 ? sumArray[(y - 1) * sum_w + x] : 0;
-
       pixelVal -= x > 0 && y > 0 ? sumArray[(y - 1) * sum_w + (x - 1)] : 0;
-
+      
+      // Storing the cumulative sum in the summed Table
       sumArray[y * sum_w + x] = pixelVal;
     }
   }
 
-  // Aplicar o desfoque, ao usar a matriz da soma cumulativa
+  // Applying the box filter in each pixel
   for (y = 0; y < h; y++) {
     for (x = 0; x < w; x++) {
+      // Defining the coordinates of the filter window
       int x1 = x;
       int y1 = y;
       int x2 = x + 2 * dx;
@@ -809,6 +819,7 @@ void ImageBlur(Image img, int dx, int dy) {
       // filter kernel size of (dx, dy).
       sum += x1 > 0 && y1 > 0 ? sumArray[(y1 - 1) * sum_w + (x1 - 1)] : 0;
 
+      // Setting the blurred pixel back into the original image
       ImageSetPixel(img, x, y, (int)((double)sum / (double)area + 0.5));
     }
   }

@@ -2,6 +2,11 @@
 
 Este é o código-fonte para o primeiro projeto de AED 2023-2024.
 
+## To-Do
+- [x] Fiz teste para a locate! Basta fazer $ make test10
+- [ ] PIXMEM na ImageMatchSubImage
+
+
 ## Relatório
 [Relatório](https://uapt33090-my.sharepoint.com/:w:/g/personal/raquelvinagre_ua_pt/EcR63dF8OUVJnSbDMUyzQDYBQIKODndapcDy3vLkHjvrqA?e=FhowFi)
 
