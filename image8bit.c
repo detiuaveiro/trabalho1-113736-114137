@@ -621,7 +621,8 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
   assert(ImageValidPos(img1, x, y));
 
   for (int y_cord = 0; y_cord < img2->height; y_cord++) {
-    // Compare entire rows at once
+    // Use memcmp to compare entire rows at once
+    // Use G to get the index
     PIXMEM+=img2->width;
     if (memcmp(&img1->pixel[G(img1, x, y + y_cord)], &img2->pixel[G(img2, 0, y_cord)], img2->width) != 0) {
       return 0; // Rows are not equal
@@ -658,104 +659,6 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2) { ///
 /// Each pixel is substituted by the mean of the pixels in the rectangle
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
-// void ImageBlur(Image img, int dx, int dy) {
-//   assert(img != NULL);
-//   assert(dx >= 0 && dy >= 0);
-//   // Written by us
-//   int width = img->width;
-//   int height = img->height;
-//   int size = width * height;
-
-//   uint8 *blurredPixels = (uint8 *)malloc(size * sizeof(uint8));
-
-//   uint8 *originalPixels = img->pixel;
-
-//   for (int y = 0; y < height; y++) {
-//     for (int x = 0; x < width; x++) {
-//       int sum = 0;
-//       int count = 0;
-//       int newYLim = y + dy;
-//       int newXLim = x + dx;
-
-//       for (int newY= y-dy; newY <= newYLim; newY++) {
-//         if (newY >= 0 && newY < height) {
-
-//           for (int newX = x-dx; newX <= newXLim; newX++) {
-
-//             if (newX >= 0 && newX < width) {
-//               // int pixelIndex = newY * width + newX;
-//               // sum += originalPixels[pixelIndex];
-//               // PIXMEM += 1;
-//               sum += ImageGetPixel(img,newX,newY);
-//               count++;
-//             }
-//           }
-//         }
-//       }
-
-//       int pixelIndex = y * width + x;
-//       // (sum + count/2) / count  , isto para não ter de usar sum e count como doubles
-//       // escolhemos fazer o cálculo desta forma para ser mais eficiente do que usar "floating-point arithmetic"
-//       *(blurredPixels + pixelIndex) = (uint8)((sum + (count >> 1)) / count);
-//     }
-//   }
-
-//   memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); // seria necessario um header file a mais
-//   PIXMEM+=size;
-//   free(blurredPixels);
-//   printf("PIXMEM: %ld\n",PIXMEM);
-// }
-
-
-
-
-// void ImageBlur(Image img, int dx, int dy) {
-//   assert(img != NULL);
-//   assert(dx >= 0 && dy >= 0);
-//   // Written by us
-//   int width = img->width;
-//   int height = img->height;
-//   // int size = width * height;
-
-//   // uint8 *blurredPixels = (uint8 *)malloc(size * sizeof(uint8));
-
-//   uint8 *originalPixels = img->pixel;
-//     // 1D horizontal blur
-//     // 1D horizontal blur
-//   int *temp = malloc(width * height * sizeof(int));
-
-//     // Horizontal pass
-//     for (int y = 0; y < height; y++) {
-//         for (int x = 0; x < width; x++) {
-//             double sum = 0;
-//             double count = 0;
-//             for (int i = x - dx; i <= x + dx; i++) {
-//                 if (i >= 0 && i < width) {
-//                     sum += originalPixels[y * width + i];
-//                     count++;
-//                 }
-//             }
-//             temp[y * width + x] = (sum / count);
-//         }
-//     }
-
-//     // Vertical pass
-//     for (int x = 0; x < width; x++) {
-//         for (int y = 0; y < height; y++) {
-//             double sum = 0;
-//             double count = 0;
-//             for (int j = y - dy; j <= y + dy; j++) {
-//                 if (j >= 0 && j < height) {
-//                     sum += (int)(temp[j * width + x] +0.5);
-//                     count++;
-//                 }
-//             }
-//             originalPixels[y * width + x] = t(sum / count);
-//         }
-//     }
-//     // Free temporary array
-//     free(temp);
-// }
 
 
 void ImageBlur(Image img, int dx, int dy) {
@@ -811,17 +714,19 @@ void ImageBlur(Image img, int dx, int dy) {
 
       // Start in bottom right corner of the sum table
       int sum = sumTable[y2 * sum_w + x2];
+
       // Remove the bottom left corner of the sum table
       sum -= x1 > 0 ? sumTable[y2 * sum_w + (x1 - 1)] : 0;
+
       // Remove the top right corner of the sum table
       sum -= y1 > 0 ? sumTable[(y1 - 1) * sum_w + x2] : 0;
+
       // Add the top left corner of the sum table.
       // this gives us the sum at (x, y) considering the
       // filter kernel size of (dx, dy).
       sum += x1 > 0 && y1 > 0 ? sumTable[(y1 - 1) * sum_w + (x1 - 1)] : 0;
-  // Doing the 
-      // Doing the calculations in the summed table
-      // T      // (area >> 1) is the same as (area / 2) but faster and avoiding       // (area >> 1) is the same as (area / 2) but faster and avoiding floating point arithmetic./  
+      
+      // (area >> 1) is the same as (area / 2) but faster and avoiding floating point arithmetic
       // Setting the blurred pixel back into the original image
       ImageSetPixel(img, x, y, (uint8)((sum + (area >> 1)) / area));
     }
@@ -832,179 +737,54 @@ void ImageBlur(Image img, int dx, int dy) {
 }
 
 
-  // Doing the 
-      // Doing the calculations in the summed table
-      // T      // (area >> 1) is the same as (area / 2) but faster and avoiding       // (area >> 1) is the same as (area / 2) but faster and avoiding floating point arithmetic./  
-// void ImageBlur(Image img, int dx, int dy) {
-//   assert(img != NULL);
-//   assert(dx >= 0);
-//   assert(dy >= 0);
-
-//   Image img1 = ImageCreate(img->width, img->height, img->maxval);
-//   int x, y;
-//   int h = img->height;
-//   int w = img->width;
-//   for (y = 0; y < h; y++) {
-//     for (x = 0; x < w; x++) {
-//       double sum = 0.0;
-//       double count = 0.0;
-//       int i, j;
-//       for (j = y - dy; j <= y + dy; j++) {
-//         for (i = x - dx; i <= x + dx; i++) {
-//           if (ImageValidPos(img, i, j)) {
-//             sum += (ImageGetPixel(img, i, j));
-//             count++;
-//           }
-//         }
-//       }
-//       ImageSetPixel(img1, x, y, (int)(sum / count + 0.5));
-//     }
-//   }
-//   for (y = 0; y < h; y++) {
-//     for (x = 0; x < w; x++) {
-//       ImageSetPixel(img, x, y, ImageGetPixel(img1, x, y));
-//     }
-//   }
-//   free(img1);
-//   printf("PIXMEM: %ld",PIXMEM);
-// }
-
-// Melhor versão sem ser a de cima:
-
 // void ImageBlur(Image img, int dx, int dy) {
 //   assert(img != NULL);
 //   assert(dx >= 0 && dy >= 0);
-//   //written by us
-
+//   // Written by us
 //   int width = img->width;
 //   int height = img->height;
 //   int size = width * height;
 
-//   Image img_blurred = ImageCreate(width, height, img->maxval);
+//   uint8 *blurredPixels = (uint8 *)malloc(size * sizeof(uint8));
 
-//   uint8* blurredPixels = img_blurred->pixel;
-//   uint8* originalPixels = img->pixel;
+//   uint8 *originalPixels = img->pixel;
 
 //   for (int y = 0; y < height; y++) {
 //     for (int x = 0; x < width; x++) {
 //       int sum = 0;
 //       int count = 0;
+//       int newYLim = y + dy;
+//       int newXLim = x + dx;
 
-//       for (int j = -dy; j <= dy; j++) {
-//         int newY = y + j;
-
+//       for (int newY= y-dy; newY <= newYLim; newY++) {
 //         if (newY >= 0 && newY < height) {
-//           for (int i = -dx; i <= dx; i++) {
-//             int newX = x + i;
+
+//           for (int newX = x-dx; newX <= newXLim; newX++) {
 
 //             if (newX >= 0 && newX < width) {
-//               sum += originalPixels[newY * width + newX];
+//               // int pixelIndex = newY * width + newX;
+//               // sum += originalPixels[pixelIndex];
+//               // PIXMEM += 1;
+//               sum += ImageGetPixel(img,newX,newY);
 //               count++;
-//               PIXMEM++;
 //             }
 //           }
 //         }
 //       }
 
-//       blurredPixels[y * width + x] = (uint8)((sum + count / 2) / count);
-//               PIXMEM++;
+//       int pixelIndex = y * width + x;
+//       // count >> 1 is the same as count / 2 but faster and avoiding floating point arithmetic
+//       *(blurredPixels + pixelIndex) = (uint8)((sum + (count >> 1)) / count);
 //     }
 //   }
 
-//   // Copy the blurred image back to the original image
-//   for (int i = 0; i < size; i++) {
-//     originalPixels[i] = blurredPixels[i];
-//     PIXMEM++;
-//   }
-
-//   // Cleanup the blurred image
-//   ImageDestroy(&img_blurred);
-//   printf("PIXMEM: %ld",PIXMEM);
+//   memcpy(originalPixels, blurredPixels, size * sizeof(uint8)); 
+//   PIXMEM+=size;
+//   free(blurredPixels);
 // }
 
-// Outra versão do código:
 
-// void ImageBlur(Image img, int dx, int dy) {
-//   assert(img != NULL);
-//   assert(dx >= 0 && dy >= 0);
-//   //written by us
 
-// int width = img->width;
-//   int height = img->height;
 
-//   Image blurredImg = ImageCreate(width, height, img->maxval);
 
-//   for (int x = 0; x < width; x++) {
-//     for (int y = 0; y < height; y++) {
-//       int sum = 0;
-//       int count = 0;
 
-//       for (int i = -dx; i <= dx; i++) {
-//         for (int j = -dy; j <= dy; j++) {
-//           int newX = x + i;
-//           int newY = y + j;
-
-//           if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-//             sum += ImageGetPixel(img, newX, newY);
-//             count++;
-//           }
-//         }
-//       }
-
-//       int meanValue = (int)(sum / (double)count + 0.5); // Rounding
-//       correction ImageSetPixel(blurredImg, x, y, meanValue);
-//     }
-//   }
-
-//   // Copy the blurred image back to the original image
-//   for (int x = 0; x < width; x++) {
-//     for (int y = 0; y < height; y++) {
-//       ImageSetPixel(img, x, y, ImageGetPixel(blurredImg, x, y));
-//     }
-//   }
-
-//   // Cleanup the blurred image
-//   ImageDestroy(&blurredImg);
-
-// }
-
-// Outra versão do código:
-//  void ImageBlur(Image img, int dx, int dy) {
-//    assert(img != NULL);
-//    assert(dx >= 0 && dy >= 0);
-//    //written by us
-
-//   int width = img->width;
-//   int height = img->height;
-
-//   Image img_blurred = ImageCreate(width, height, img->maxval);
-
-//   for (int x = 0; x < width; x++) {
-//     for (int y = 0; y < height; y++) {
-//       int sum = 0;
-//       int count = 0;
-
-//       for (int x_cord = x - dx; x_cord <= x + dx; x_cord++) {
-//         for (int y_cord = y - dy; y_cord <= y + dy; y_cord++) {
-//           if (ImageValidPos(img, x_cord, y_cord)) {
-//             sum += ImageGetPixel(img, x_cord, y_cord);
-//             count++;
-//           }
-//         }
-//       }
-
-//       uint8 new_pixel = (uint8)((sum + count / 2) / count); // Rounding
-//       correction ImageSetPixel(img_blurred, x, y, new_pixel);
-//     }
-//   }
-
-//   // Copy the blurred image back to the original image
-//   for (int x = 0; x < width; x++) {
-//     for (int y = 0; y < height; y++) {
-//       ImageSetPixel(img, x, y, ImageGetPixel(img_blurred, x, y));
-//     }
-//   }
-
-//   // Cleanup the blurred image
-//   ImageDestroy(&img_blurred);
-// }
