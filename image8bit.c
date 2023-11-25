@@ -622,13 +622,11 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
 
   for (int y_cord = 0; y_cord < img2->height; y_cord++) {
     // Compare entire rows at once
-    // Not sure mas acho que é preciso usar PIXMEM aqui!  
     PIXMEM+=img2->width;
     if (memcmp(&img1->pixel[G(img1, x, y + y_cord)], &img2->pixel[G(img2, 0, y_cord)], img2->width) != 0) {
       return 0; // Rows are not equal
     }
   }
-
   return 1; // All rows are equal
 }
 
