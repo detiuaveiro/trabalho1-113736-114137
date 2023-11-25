@@ -623,6 +623,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
   for (int y_cord = 0; y_cord < img2->height; y_cord++) {
     // Compare entire rows at once
     // Not sure mas acho que é preciso usar PIXMEM aqui!  
+    PIXMEM+=img2->width;
     if (memcmp(&img1->pixel[G(img1, x, y + y_cord)], &img2->pixel[G(img2, 0, y_cord)], img2->width) != 0) {
       return 0; // Rows are not equal
     }
@@ -769,33 +770,33 @@ void ImageBlur(Image img, int dx, int dy) {
   int x, y;
 
   // Dimensions of the summed table
-  const int sum_w = w + 2 * dx;
-  const int sum_h = w + 2 * dy;
+  const int sum_w = w + 2 * dx; // this is so there are enough pixels to the left and right
+  const int sum_h = h + 2 * dy; // this is so there are enough pixels to the left and above
 
   // Allocate memory for the summed Table
-  int *sumArray = (int *)malloc(sum_h * sum_w * sizeof(int));
+  int *sumTable = (int *)malloc(sum_h * sum_w * sizeof(int)); 
   
   // Calculate the area of the filter kernel
-  const int area = (2 * dx + 1) * (2 * dy + 1);
+  const int area = (2 * dx + 1) * (2 * dy + 1); // 2* because of the left and right side and +1 because of the center pixel
 
 
   // Computing the summed Table
   for (y = 0; y < h + 2 * dy; y++) {
     for (x = 0; x < w + 2 * dx; x++) {
       // Coordinates inside the original image
-      const int x_dentro = x < dx ? 0 : (x - dx >= w ? w - 1 : x - dx);
+      const int x_dentro = x < dx ? 0 : (x - dx >= w ? w - 1 : x - dx);  
       const int y_dentro = y < dy ? 0 : (y - dy >= h ? h - 1 : y - dy);
 
       // Pixel value at the calculated coordinates
       int pixelVal = ImageGetPixel(img, x_dentro, y_dentro);
     
       // Adding the values from left and above,subrtract the overlapping corner
-      pixelVal += x > 0 ? sumArray[y * sum_w + (x - 1)] : 0;
-      pixelVal += y > 0 ? sumArray[(y - 1) * sum_w + x] : 0;
-      pixelVal -= x > 0 && y > 0 ? sumArray[(y - 1) * sum_w + (x - 1)] : 0;
+      pixelVal += x > 0 ? sumTable[y * sum_w + (x - 1)] : 0;
+      pixelVal += y > 0 ? sumTable[(y - 1) * sum_w + x] : 0;
+      pixelVal -= x > 0 && y > 0 ? sumTable[(y - 1) * sum_w + (x - 1)] : 0;
       
       // Storing the cumulative sum in the summed Table
-      sumArray[y * sum_w + x] = pixelVal;
+      sumTable[y * sum_w + x] = pixelVal;
     }
   }
 
@@ -808,28 +809,34 @@ void ImageBlur(Image img, int dx, int dy) {
       int x2 = x + 2 * dx;
       int y2 = y + 2 * dy;
 
+      // Doing the calculations in the summed table
+
       // Start in bottom right corner of the sum table
-      int sum = sumArray[y2 * sum_w + x2];
+      int sum = sumTable[y2 * sum_w + x2];
       // Remove the bottom left corner of the sum table
-      sum -= x1 > 0 ? sumArray[y2 * sum_w + (x1 - 1)] : 0;
+      sum -= x1 > 0 ? sumTable[y2 * sum_w + (x1 - 1)] : 0;
       // Remove the top right corner of the sum table
-      sum -= y1 > 0 ? sumArray[(y1 - 1) * sum_w + x2] : 0;
+      sum -= y1 > 0 ? sumTable[(y1 - 1) * sum_w + x2] : 0;
       // Add the top left corner of the sum table.
       // this gives us the sum at (x, y) considering the
       // filter kernel size of (dx, dy).
-      sum += x1 > 0 && y1 > 0 ? sumArray[(y1 - 1) * sum_w + (x1 - 1)] : 0;
-
+      sum += x1 > 0 && y1 > 0 ? sumTable[(y1 - 1) * sum_w + (x1 - 1)] : 0;
+  // Doing the 
+      // Doing the calculations in the summed table
+      // T      // (area >> 1) is the same as (area / 2) but faster and avoiding       // (area >> 1) is the same as (area / 2) but faster and avoiding floating point arithmetic./  
       // Setting the blurred pixel back into the original image
-      ImageSetPixel(img, x, y, (int)((double)sum / (double)area + 0.5));
+      ImageSetPixel(img, x, y, (uint8)((sum + (area >> 1)) / area));
     }
   }
 
   // Free allocated memory
-  free(sumArray);
+  free(sumTable);
 }
 
 
-
+  // Doing the 
+      // Doing the calculations in the summed table
+      // T      // (area >> 1) is the same as (area / 2) but faster and avoiding       // (area >> 1) is the same as (area / 2) but faster and avoiding floating point arithmetic./  
 // void ImageBlur(Image img, int dx, int dy) {
 //   assert(img != NULL);
 //   assert(dx >= 0);
