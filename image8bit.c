@@ -593,7 +593,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
   }
 }
 
-/*
+/* OLD VERSION
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
@@ -691,7 +691,7 @@ void ImageBlur(Image img, int dx, int dy) {
       // Pixel value at the calculated coordinates
       int pixelVal = ImageGetPixel(img, x_dentro, y_dentro);
     
-      // Adding the values from left and above,subrtract the overlapping corner
+      // Adding the values from left and above,subtract the overlapping corner
       pixelVal += x > 0 ? sumTable[y * sum_w + (x - 1)] : 0;
       pixelVal += y > 0 ? sumTable[(y - 1) * sum_w + x] : 0;
       pixelVal -= x > 0 && y > 0 ? sumTable[(y - 1) * sum_w + (x - 1)] : 0;
@@ -736,7 +736,7 @@ void ImageBlur(Image img, int dx, int dy) {
   free(sumTable);
 }
 
-
+//OLD VERSION
 // void ImageBlur(Image img, int dx, int dy) {
 //   assert(img != NULL);
 //   assert(dx >= 0 && dy >= 0);
