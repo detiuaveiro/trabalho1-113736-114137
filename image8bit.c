@@ -593,7 +593,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
   }
 }
 
-/*
+/* OLD VERSION
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
