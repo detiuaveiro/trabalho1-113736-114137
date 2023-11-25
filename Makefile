@@ -77,11 +77,17 @@ test10: $(PROGS) setup
 	cmp paste.pgm test/paste.pgm
 	./imageTool tic test/small.pgm paste.pgm locate toc
 
-test11: $(PROGS) setup
+teste_macaco_arvore: $(PROGS) setup
 	./imageTool pgm/medium/mandrill_512x512.pgm belgium_514505.pgm paste 9486,6153 save paste.pgm
 	./imageTool pgm/medium/mandrill_512x512.pgm paste.pgm tic locate toc
 	./imageTool pgm/medium/mandrill_512x512.pgm belgium_514505.pgm paste 0,0 save paste.pgm
 	./imageTool pgm/medium/mandrill_512x512.pgm paste.pgm tic locate toc
+
+teste_passaro_castelo: $(PROGS) setup
+	./imageTool pgm/small/bird_256x256.pgm pgm/large/ireland_03_1600x1200.pgm paste 1343,943 save paste.pgm
+	./imageTool pgm/small/bird_256x256.pgm paste.pgm tic locate toc
+	./imageTool pgm/small/bird_256x256.pgm pgm/large/ireland_03_1600x1200.pgm paste 0,0 save paste.pgm
+	./imageTool pgm/small/bird_256x256.pgm paste.pgm tic locate toc
 
 .PHONY: tests
 tests: $(TESTS)
