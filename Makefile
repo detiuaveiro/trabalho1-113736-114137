@@ -75,7 +75,13 @@ test9: $(PROGS) setup
 test10: $(PROGS) setup
 	./imageTool test/small.pgm test/original.pgm paste 100,100 save paste.pgm
 	cmp paste.pgm test/paste.pgm
-	./imageTool tic test/small.pgm toc paste.pgm locate
+	./imageTool tic test/small.pgm paste.pgm locate toc
+
+test11: $(PROGS) setup
+	./imageTool pgm/medium/mandrill_512x512.pgm belgium_514505.pgm paste 9486,6153 save paste.pgm
+	./imageTool pgm/medium/mandrill_512x512.pgm paste.pgm tic locate toc
+	./imageTool pgm/medium/mandrill_512x512.pgm belgium_514505.pgm paste 0,0 save paste.pgm
+	./imageTool pgm/medium/mandrill_512x512.pgm paste.pgm tic locate toc
 
 .PHONY: tests
 tests: $(TESTS)
