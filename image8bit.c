@@ -738,7 +738,7 @@ void ImageBlur(Image img, int dx, int dy) {
 
 
 
-// 3ª Abordagem - Sem Clamping -> tenho que alterar algumas coisas
+// 3ª Abordagem - Sem Clamping
 // void ImageBlur(Image img, int dx, int dy) {
 //     assert(img != NULL);
 //     assert(dx >= 0 && dy >= 0);
@@ -747,13 +747,16 @@ void ImageBlur(Image img, int dx, int dy) {
 //     int h = img->height;
 //     int x, y;
 
-//     // Sum table horizontal
+//     // Sum table
 //    double *sumTable = (double *)malloc(h * w * sizeof(double));
 
-// // Preenchendo a matriz de soma cumulativa
+// // Computing the summed table
 // for (y = 0; y < h; y++) {
 //     for (x = 0; x < w; x++) {
 //         double pixelVal = ImageGetPixel(img, x, y);
+
+//         // Add the values from left and above, subtract the overlapping corner
+
 //         pixelVal += (x > 0 ? sumTable[y * w + (x - 1)] : 0);
 //         pixelVal += (y > 0 ? sumTable[(y - 1) * w + x] : 0);
 //         pixelVal -= (x > 0 && y > 0 ? sumTable[(y - 1) * w + (x - 1)] : 0);
@@ -761,7 +764,7 @@ void ImageBlur(Image img, int dx, int dy) {
 //     }
 // }
 
-// // Aplicar o desfoque, usando a matriz de soma cumulativa
+// // Applying the box filter in each pixel
 // for (y = 0; y < h; y++) {
 //     for (x = 0; x < w; x++) {
 //         int x1 = (x - dx > 0) ? x - dx : 0;
@@ -772,8 +775,11 @@ void ImageBlur(Image img, int dx, int dy) {
 //         int area = (x2 - x1 + 1) * (y2 - y1 + 1);
 
 //         int sum = sumTable[y2 * w + x2];
+//         // Remove the bottom left corner of the sum table
 //         sum -= (x1 > 0 ? sumTable[y2 * w + x1 - 1] : 0);
+//         // Remove the top right corner of the sum table
 //         sum -= (y1 > 0 ? sumTable[(y1 - 1) * w + x2] : 0);
+//         // Add the top left corner of the sum table.
 //         sum += (x1 > 0 && y1 > 0 ? sumTable[(y1 - 1) * w + x1 - 1] : 0);
 
 //       ImageSetPixel(img, x, y, (uint8)((sum + (area >> 1)) / area)); 
