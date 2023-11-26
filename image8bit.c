@@ -676,7 +676,7 @@ void ImageBlur(Image img, int dx, int dy) {
 
   // Allocate memory for the summed Table
   int *sumTable = (int *)malloc(sum_h * sum_w * sizeof(int)); 
-  
+ 
   // Calculate the area of the filter kernel
   const int area = (2 * dx + 1) * (2 * dy + 1); // 2* because of the left and right side and +1 because of the center pixel
 
@@ -737,7 +737,7 @@ void ImageBlur(Image img, int dx, int dy) {
 
 
 
-// Sem Clamping -> tenho que alterar algumas coisas
+// Sem Clamping que não depende de dx & dy -> tenho que alterar algumas coisas
 // void ImageBlur(Image img, int dx, int dy) {
 //     assert(img != NULL);
 //     assert(dx >= 0 && dy >= 0);
@@ -747,16 +747,16 @@ void ImageBlur(Image img, int dx, int dy) {
 //     int x, y;
 
 //     // Sum table horizontal
-//    double *sumArray = (double *)malloc(h * w * sizeof(double));
+//    double *sumTable = (double *)malloc(h * w * sizeof(double));
 
 // // Preenchendo a matriz de soma cumulativa
 // for (y = 0; y < h; y++) {
 //     for (x = 0; x < w; x++) {
 //         double pixelVal = ImageGetPixel(img, x, y);
-//         sumArray[y * w + x] = pixelVal +
-//                               (x > 0 ? sumArray[y * w + (x - 1)] : 0) +
-//                               (y > 0 ? sumArray[(y - 1) * w + x] : 0) -
-//                               (x > 0 && y > 0 ? sumArray[(y - 1) * w + (x - 1)] : 0);
+//         pixelVal += (x > 0 ? sumTable[y * w + (x - 1)] : 0);
+//         pixelVal += (y > 0 ? sumTable[(y - 1) * w + x] : 0);
+//         pixelVal -= (x > 0 && y > 0 ? sumTable[(y - 1) * w + (x - 1)] : 0);
+//         sumTable[y * w + x] = pixelVal;
 //     }
 // }
 
@@ -768,18 +768,19 @@ void ImageBlur(Image img, int dx, int dy) {
 //         int x2 = (x + dx < w) ? x + dx : w - 1;
 //         int y2 = (y + dy < h) ? y + dy : h - 1;
 
-//         double area = (x2 - x1 + 1) * (y2 - y1 + 1);
-//         double sum = sumArray[y2 * w + x2] -
-//                      (x1 > 0 ? sumArray[y2 * w + x1 - 1] : 0) -
-//                      (y1 > 0 ? sumArray[(y1 - 1) * w + x2] : 0) +
-//                      (x1 > 0 && y1 > 0 ? sumArray[(y1 - 1) * w + x1 - 1] : 0);
+//         int area = (x2 - x1 + 1) * (y2 - y1 + 1);
 
-//         ImageSetPixel(img, x, y, (int)(sum / area + 0.5));
+//         int sum = sumTable[y2 * w + x2];
+//         sum -= (x1 > 0 ? sumTable[y2 * w + x1 - 1] : 0);
+//         sum -= (y1 > 0 ? sumTable[(y1 - 1) * w + x2] : 0);
+//         sum += (x1 > 0 && y1 > 0 ? sumTable[(y1 - 1) * w + x1 - 1] : 0);
+
+//       ImageSetPixel(img, x, y, (uint8)((sum + (area >> 1)) / area)); 
 //     }
 // }
 
 // // Free allocated memory
-// free(sumArray);
+// free(sumTable);
 // }
 
 
